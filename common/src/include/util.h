@@ -96,6 +96,9 @@ enum class Action {
     DetectNonScannedMorphWithProbeImg,
     DetectScannedMorphWithProbeImg,
     DetectUnknownMorphWithProbeImg,
+    DetectNonScannedMorphWithProbeImgAndMeta,
+    DetectScannedMorphWithProbeImgAndMeta,
+    DetectUnknownMorphWithProbeImgAndMeta,
     Compare,
 	/* QUALITY */
 	ScalarQ,
@@ -135,6 +138,5 @@ extern std::map<std::string, FRVT::Image::Label> mapStringToImgLabel;
  * Mapping ReturnCode to string
  */
 extern std::map<FRVT::ReturnCode, std::string> mapRetCodeToString;
-
 
 #endif /* UTIL_H_ */

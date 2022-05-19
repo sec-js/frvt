@@ -41,8 +41,16 @@ public:
         const FRVT::ImageLabel &label,
         const FRVT::Image &liveFace,
         bool &isMorph,
-        double &score,
-        const int &ageDeltaInDays = -1) override;
+        double &score) override;
+
+    FRVT::ReturnStatus
+    detectMorphDifferentially(
+        const FRVT::Image &suspectedMorph,
+        const FRVT::ImageLabel &label,
+        const FRVT::Image &liveFace,
+        const FRVT_MORPH::SubjectMetadata &subjectMetadata,
+        bool &isMorph,
+        double &score) override;
 
     FRVT::ReturnStatus
     compareImages(

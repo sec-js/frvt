@@ -9,6 +9,7 @@
  */
 
 #include <cstring>
+#include <iostream>
 #include "nullimplfrvtmorph.h"
 
 using namespace std;
@@ -48,8 +49,7 @@ NullImplFRVTMorph::detectMorphDifferentially(
     const ImageLabel &label,
     const Image &liveFace,
     bool &isMorph,
-    double &score,
-    const int &ageDeltaInDays)
+    double &score)
 {
     if (label==ImageLabel::Unknown)
         return ReturnStatus(ReturnCode::NotImplemented);
@@ -61,6 +61,23 @@ NullImplFRVTMorph::detectMorphDifferentially(
         isMorph = true;
         score = 0.81;
     return ReturnStatus(ReturnCode::Success);
+}
+
+FRVT::ReturnStatus
+NullImplFRVTMorph::detectMorphDifferentially(
+    const FRVT::Image &suspectedMorph,
+    const FRVT::ImageLabel &label,
+    const FRVT::Image &liveFace,
+    const FRVT_MORPH::SubjectMetadata &subjectMetadata,
+    bool &isMorph,
+    double &score)
+{
+   if (label==ImageLabel::Unknown)
+        return ReturnStatus(ReturnCode::NotImplemented);
+    
+    isMorph = false;
+    score = 0.124;
+    return ReturnStatus(ReturnCode::Success); 
 }
 
 ReturnStatus

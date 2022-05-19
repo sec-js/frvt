@@ -45,15 +45,26 @@ detectMorph(
 
     string line;
     ReturnStatus ret;
+
     if (action == Action::DetectNonScannedMorph ||
     	action == Action::DetectScannedMorph ||
     	action == Action::DetectUnknownMorph) {
         logStream << "image isMorph score returnCode" << endl;
     } else if (action == Action::DetectNonScannedMorphWithProbeImg ||
     	action == Action::DetectScannedMorphWithProbeImg ||
-    	action == Action::DetectUnknownMorphWithProbeImg) {
+    	action == Action::DetectUnknownMorphWithProbeImg || 
+        action == Action::DetectNonScannedMorphWithProbeImgAndMeta ||
+        action == Action::DetectScannedMorphWithProbeImgAndMeta ||
+        action == Action::DetectUnknownMorphWithProbeImgAndMeta) {
         logStream << "image probeImage isMorph score returnCode" << endl;
     }
+
+    std::map<std::string, FRVT_MORPH::SubjectMetadata::Sex> mapStringToSexLabel =
+    {
+        { "UNKNOWN", FRVT_MORPH::SubjectMetadata::Sex::Unknown },
+        { "FEMALE", FRVT_MORPH::SubjectMetadata::Sex::Female },
+        { "MALE", FRVT_MORPH::SubjectMetadata::Sex::Male },
+    };
 
     while(std::getline(inputStream, line)) {
         Image image, probeImage;
@@ -77,6 +88,15 @@ detectMorph(
                 raise(SIGTERM);
             }
             ret = implPtr->detectMorphDifferentially(image, mapActionToMorphLabel[action], probeImage, isMorph, score);
+        } else if (action == Action::DetectNonScannedMorphWithProbeImgAndMeta ||
+                action == Action::DetectScannedMorphWithProbeImgAndMeta ||
+                action == Action::DetectUnknownMorphWithProbeImgAndMeta) {
+            if (!readImage(imgs[1], probeImage)) {
+                cerr << "Failed to load image file(s): " << imgs[1] << "." << endl;
+                raise(SIGTERM);
+            }
+            FRVT_MORPH::SubjectMetadata meta(mapStringToSexLabel[imgs[2]], std::stoi(imgs[3]), std::stoi(imgs[4])); 
+            ret = implPtr->detectMorphDifferentially(image, mapActionToMorphLabel[action], probeImage, meta, isMorph, score);
         }
 
         /* If function is not implemented, clean up and exit */
@@ -88,7 +108,10 @@ detectMorph(
         logStream << imgs[0] << " ";
         if (action == Action::DetectNonScannedMorphWithProbeImg ||
                 action == Action::DetectScannedMorphWithProbeImg ||
-                action == Action::DetectUnknownMorphWithProbeImg)
+                action == Action::DetectUnknownMorphWithProbeImg ||
+                action == Action::DetectNonScannedMorphWithProbeImgAndMeta ||
+                action == Action::DetectScannedMorphWithProbeImgAndMeta ||
+                action == Action::DetectUnknownMorphWithProbeImgAndMeta)
             logStream << imgs[1] << " ";
 
         logStream << isMorph << " "
@@ -190,6 +213,9 @@ void usage(const string &executable)
             "|detectNonScannedMorphWithProbeImg"
             "|detectScannedMorphWithProbeImg"
             "|detectUnknownMorphWithProbeImg"
+            "|detectNonScannedMorphWithProbeImgAndMeta"
+            "|detectScannedMorphWithProbeImgAndMeta"
+            "|detectUnknownMorphWithProbeImgAndMeta"
             "|compare -c configDir "
             "-o outputDir -h outputStem -i inputFile -t numForks" << endl;
     exit(EXIT_FAILURE);
@@ -202,8 +228,8 @@ main(
 {
     auto exitStatus = SUCCESS;
 
-    uint16_t currAPIMajorVersion{2},
-		currAPIMinorVersion{1},
+    uint16_t currAPIMajorVersion{3},
+		currAPIMinorVersion{0},
 		currStructsMajorVersion{1},
 		currStructsMinorVersion{2};
 
@@ -261,6 +287,7 @@ main(
         }
     }
 
+
     Action action = mapStringToAction[actionstr];
     switch (action) {
         case Action::DetectNonScannedMorph:
@@ -269,6 +296,9 @@ main(
         case Action::DetectNonScannedMorphWithProbeImg:
         case Action::DetectScannedMorphWithProbeImg:
         case Action::DetectUnknownMorphWithProbeImg:
+        case Action::DetectNonScannedMorphWithProbeImgAndMeta:
+        case Action::DetectScannedMorphWithProbeImgAndMeta:
+        case Action::DetectUnknownMorphWithProbeImgAndMeta:
         case Action::Compare:
             break;
         default:
@@ -306,6 +336,9 @@ main(
                 case Action::DetectNonScannedMorphWithProbeImg:
                 case Action::DetectScannedMorphWithProbeImg:
                 case Action::DetectUnknownMorphWithProbeImg:
+                case Action::DetectNonScannedMorphWithProbeImgAndMeta:
+                case Action::DetectScannedMorphWithProbeImgAndMeta:
+                case Action::DetectUnknownMorphWithProbeImgAndMeta:
                     return detectMorph(
                             implPtr,
                             inputFile,

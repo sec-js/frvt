@@ -22,6 +22,48 @@
 namespace FRVT_MORPH {
 /**
  * @brief
+ * Struct representing metadata, including
+ * subject sex, age of subject in probe image,
+ * and age/time difference between probe and
+ * reference images 
+ */
+typedef struct SubjectMetadata {
+    /** Labels for subject sex */
+    enum class Sex {
+        /** Unknown or unassigned */
+        Unknown = 0,
+        Female,
+        Male
+    };
+     
+    /** Sex of subject */
+    Sex sex;
+    /** Age of subject (in months) in probe image
+     *  -1 indicates an unassigned value */
+    int16_t ageInMonths;
+    /** Age/time difference (in months) between probe
+     * and reference image; -1 indicates an unassigned value */
+    int16_t ageDeltaInMonths;    
+
+    SubjectMetadata() :
+        sex{Sex::Unknown},
+        ageInMonths{-1},
+        ageDeltaInMonths{-1}
+        {}
+
+    SubjectMetadata(
+        Sex sex,
+        int16_t ageInMonths,
+        int16_t ageDeltaInMonths
+        ) :
+        sex{sex},
+        ageInMonths{ageInMonths},
+        ageDeltaInMonths{ageDeltaInMonths}
+        {}
+} SubjectMetadata;
+
+/**
+ * @brief
  * The interface to FRVT MORPH implementation
  *
  * @details
@@ -119,11 +161,6 @@ public:
      * A score on [0, 1] representing how confident the algorithm is that the
      * image contains a morph.  0 means certainty that image does not contain
      * a morph and 1 represents certainty that image contains a morph
-     * @param[in] ageDeltaInDays
-     * Optional input parameter representing the time/age difference 
-     * (in days) between the suspected morph and the live probe image.
-     * Default value is -1, which means the information is not provided
-     * to the function
      */
     virtual FRVT::ReturnStatus
     detectMorphDifferentially(
@@ -131,8 +168,49 @@ public:
         const FRVT::ImageLabel &label,
         const FRVT::Image &probeFace,
         bool &isMorph,
-        double &score,
-		const int &ageDeltaInDays = -1) = 0;
+        double &score) = 0;
+
+    /**
+     * @brief This function takes two images and information 
+     * about the subject as input.  The inputs are a known unaltered/not morphed
+     * image of the subject, an image of the same subject that's in question
+     * (may or may not be a morph), and subject metadata (sex, age,
+     * age/time difference between probe and reference image).  This function outputs
+     * 1. a binary decision on whether <b>suspectedMorph</b> is a morph
+     * (given <b>probeFace</b> as a prior)
+     * 2. a "morphiness" score on [0, 1] indicating how confident the algorithm
+     * thinks the image is a morph, with 0 meaning confidence that the image
+     * is not a morph and 1 representing absolute confidence that it is a morph
+     *
+     * If this function is not implemented, the algorithm shall return
+     * ReturnCode::NotImplemented.  
+     *
+     * @param[in] suspectedMorph
+     * An image in question of being a morph (or not)
+     * @param[in] label
+     * Label indicating the type of imagery for the suspected morph.  Possible
+     * types are non-scanned photo, printed-and-scanned photo, or unknown.
+     * @param[in] probeFace
+     * An image of the subject known not to be a morph (i.e., live capture
+     * image)
+     * @param[in] subjectMetadata
+     * Information about the subject, including sex, subject's age in the probe image,
+     * and age/time difference between the suspected morph and the probe image  
+     * @param[out] isMorph
+     * True if suspectedMorph image contains a morph; False otherwise
+     * @param[out] score
+     * A score on [0, 1] representing how confident the algorithm is that the
+     * image contains a morph.  0 means certainty that image does not contain
+     * a morph and 1 represents certainty that image contains a morph
+     */
+    virtual FRVT::ReturnStatus
+    detectMorphDifferentially(
+        const FRVT::Image &suspectedMorph,
+        const FRVT::ImageLabel &label,
+        const FRVT::Image &probeFace,
+        const FRVT_MORPH::SubjectMetadata &subjectMetadata,
+        bool &isMorph,
+        double &score) = 0;
 
     /**
      * @brief This function compares two images and outputs a
@@ -188,9 +266,9 @@ extern uint16_t API_MAJOR_VERSION;
 extern uint16_t API_MINOR_VERSION;
 #else /* NIST_EXTERN_API_VERSION */
 /** API major version number. */
-uint16_t API_MAJOR_VERSION{2};
+uint16_t API_MAJOR_VERSION{3};
 /** API minor version number. */
-uint16_t API_MINOR_VERSION{1};
+uint16_t API_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_API_VERSION */
 }
 

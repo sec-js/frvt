@@ -181,6 +181,9 @@ std::map<std::string, Action> mapStringToAction =
     { "detectNonScannedMorphWithProbeImg", Action::DetectNonScannedMorphWithProbeImg },
     { "detectScannedMorphWithProbeImg", Action::DetectScannedMorphWithProbeImg },
     { "detectUnknownMorphWithProbeImg", Action::DetectUnknownMorphWithProbeImg },
+    { "detectNonScannedMorphWithProbeImgAndMeta", Action::DetectNonScannedMorphWithProbeImgAndMeta },
+    { "detectScannedMorphWithProbeImgAndMeta", Action::DetectScannedMorphWithProbeImgAndMeta },
+    { "detectUnknownMorphWithProbeImgAndMeta", Action::DetectUnknownMorphWithProbeImgAndMeta },
     { "compare", Action::Compare },
     /* QUALITY */
     { "scalarQ", Action::ScalarQ },
@@ -209,6 +212,9 @@ std::map<Action, std::string> mapActionToString =
     { Action::DetectNonScannedMorphWithProbeImg, "detectNonScannedMorphWithProbeImg" },
     { Action::DetectScannedMorphWithProbeImg, "detectScannedMorphWithProbeImg" },
     { Action::DetectUnknownMorphWithProbeImg, "detectUnknownMorphWithProbeImg" },
+    { Action::DetectNonScannedMorphWithProbeImgAndMeta, "detectNonScannedMorphWithProbeImgAndMeta" },
+    { Action::DetectScannedMorphWithProbeImgAndMeta, "detectScannedMorphWithProbeImgAndMeta" },
+    { Action::DetectUnknownMorphWithProbeImgAndMeta, "detectUnknownMorphWithProbeImgAndMeta" },
     { Action::Compare, "compare" },
     /* QUALITY */
     { Action::ScalarQ, "scalarQ" },
@@ -225,7 +231,10 @@ std::map<Action, FRVT::ImageLabel> mapActionToMorphLabel =
     { Action::DetectUnknownMorph, FRVT::ImageLabel::Unknown },
     { Action::DetectNonScannedMorphWithProbeImg, FRVT::ImageLabel::NonScanned },
     { Action::DetectScannedMorphWithProbeImg, FRVT::ImageLabel::Scanned },
-    { Action::DetectUnknownMorphWithProbeImg, FRVT::ImageLabel::Unknown }
+    { Action::DetectUnknownMorphWithProbeImg, FRVT::ImageLabel::Unknown },
+    { Action::DetectNonScannedMorphWithProbeImgAndMeta, FRVT::ImageLabel::NonScanned },
+    { Action::DetectScannedMorphWithProbeImgAndMeta, FRVT::ImageLabel::Scanned },
+    { Action::DetectUnknownMorphWithProbeImgAndMeta, FRVT::ImageLabel::Unknown }
 };
 
 std::map<std::string, FRVT::Image::Label> mapStringToImgLabel =
