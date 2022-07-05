@@ -353,49 +353,80 @@ enum class ImageLabel {
 
 /** Quality element labels 
  */
-enum class QualityElement {
+enum class QualityItem {
     Begin = 0,
-    /** Subject pose yaw */ 
-    SubjectPoseYaw = Begin,
-    /** Subject pose pitch */
+    SubjectPoseRoll = Begin,
     SubjectPosePitch,
-    /** Subject pose roll */ 
-    SubjectPoseRoll,
-    /** Subject occlusion nose and mouth */
-    SubjectOcclusionNoseMouth,
-    /** Capture motion blur */
-    CaptureMotionBlur,
+    SubjectPoseYaw,
+    EyeGlassesPresent,
+    SunGlassesPresent,
+    Underexposure,
+    Overexposure,
+    BackgroundUniformity,
+    MouthOpen,
+    FaceOcclusion,
+    Resolution,
+    InterocularDistance,
+    PixelsFromHeadToLeftEdge,
+    PixelsFromHeadToRightEdge,
+    PixelsFromChinToBottom,
+    PixelsFromHeadToTop,
+    ScalarQualityValue,
     End
 };
 
-/** To support iterating over QualityElement enum values */
-inline QualityElement& 
-operator++(QualityElement& qe) {
-   if (qe == QualityElement::End) 
-        throw std::out_of_range("QualityElement& operator++(QualityElement&)");
-    qe = QualityElement(static_cast<std::underlying_type<QualityElement>::type>(qe) + 1);
+/** To support iterating over QualityItem enum values */
+inline QualityItem& 
+operator++(QualityItem& qe) {
+   if (qe == QualityItem::End) 
+        throw std::out_of_range("QualityItem& operator++(QualityItem&)");
+    qe = QualityItem(static_cast<std::underlying_type<QualityItem>::type>(qe) + 1);
     return qe;
 }
 
-/** Output stream operator for QualityElement enum. */
+/** Output stream operator for QualityItem enum. */
 inline std::ostream&
 operator<<(
     std::ostream &s,
-    const QualityElement &qe)
+    const QualityItem &qe)
 {
     switch (qe) {
-    case QualityElement::SubjectPoseYaw:
-        return (s << "subjectPoseYaw");
-    case QualityElement::SubjectPosePitch:
+    case QualityItem::SubjectPosePitch:
         return (s << "subjectPosePitch");
-    case QualityElement::SubjectPoseRoll:
+    case QualityItem::SubjectPoseRoll:
         return (s << "subjectPoseRoll");
-    case QualityElement::SubjectOcclusionNoseMouth:
-        return (s << "subjectOcclusionNoseMouth");
-    case QualityElement::CaptureMotionBlur:
-        return (s << "captureMotionBlur");
+    case QualityItem::SubjectPoseYaw:
+        return (s << "subjectPoseYaw");
+    case QualityItem::EyeGlassesPresent:
+        return (s << "eyeGlassesPresent");
+    case QualityItem::SunGlassesPresent:
+        return (s << "sunGlassesPresent");
+    case QualityItem::Underexposure:
+        return (s << "underexposure");
+    case QualityItem::Overexposure:
+        return (s << "overexposure");
+    case QualityItem::BackgroundUniformity:
+        return (s << "backgroundUniformity");
+    case QualityItem::MouthOpen:
+        return (s << "mouthOpen");
+    case QualityItem::FaceOcclusion:
+        return (s << "faceOcclusion");
+    case QualityItem::Resolution:
+        return (s << "resolution");
+    case QualityItem::InterocularDistance:
+        return (s << "interocularDistance");
+    case QualityItem::PixelsFromHeadToLeftEdge:
+        return (s << "pixelsFromHeadToLeftEdge");
+    case QualityItem::PixelsFromHeadToRightEdge:
+        return (s << "pixelsFromHeadToRightEdge");
+    case QualityItem::PixelsFromChinToBottom:
+        return (s << "pixelsFromChinToBottom");
+    case QualityItem::PixelsFromHeadToTop:
+        return (s << "pixelsFromHeadToTop");
+    case QualityItem::ScalarQualityValue:
+        return (s << "scalarQualityValue");
     default:
-        return (s << "undefined QualityElement");
+        return (s << "undefined QualityItem");
     }
 }
 
@@ -404,14 +435,64 @@ operator<<(
  * Data structure that stores key-value pairs, with each
  * entry representing a quality element and its value 
  */
-using QualityElementValues = std::map<QualityElement, double>;
+using QualityAssessments = std::map<QualityItem, double>;
+
+typedef struct BoundingBox
+{
+    /** @brief leftmost point on head, typically subject's right ear
+     *  value must be on [0, imageWidth-1] */
+    int16_t xleft; 
+    /** @brief high point of head, typically top of hair;
+     *  value must be on [0, imageHeight-1] */           
+    int16_t ytop;
+    /** @brief bounding box width */ 
+    int16_t width;
+    /** @brief bounding box height */
+    int16_t height;
+
+    BoundingBox() :
+        xleft{-1},
+        ytop{-1},
+        width{-1},
+        height{-1}
+        {}
+
+    BoundingBox(
+        int16_t xleft,
+        int16_t ytop,
+        int16_t width,
+        int16_t height) :
+        xleft{xleft},
+        ytop{ytop},
+        width{width},
+        height{height}
+        {}
+} BoundingBox;
+
+typedef struct ImageQualityAssessment
+{
+    BoundingBox boundingBox;
+    QualityAssessments qAssessments; 
+    
+    ImageQualityAssessment() :
+        boundingBox{},
+        qAssessments{}
+        {}
+
+    ImageQualityAssessment(
+        const BoundingBox &boundingBox,
+        const QualityAssessments &qAssessments) :
+        boundingBox{boundingBox},
+        qAssessments{qAssessments}
+        {}
+} ImageQualityAssessment;
 
 /*
- * Versioning
- *
- * NIST code will extern the version number symbols. Participant
- * shall compile them into their core library.
- */
+* Versioning
+*
+* NIST code will extern the version number symbols. Participant
+* shall compile them into their core library.
+*/
 #ifdef NIST_EXTERN_FRVT_STRUCTS_VERSION
 /** major version number. */
 extern uint16_t FRVT_STRUCTS_MAJOR_VERSION;
@@ -419,9 +500,9 @@ extern uint16_t FRVT_STRUCTS_MAJOR_VERSION;
 extern uint16_t FRVT_STRUCTS_MINOR_VERSION;
 #else /* NIST_EXTERN_FRVT_STRUCTS_VERSION */
 /** major version number. */
-uint16_t FRVT_STRUCTS_MAJOR_VERSION{1};
+uint16_t FRVT_STRUCTS_MAJOR_VERSION{2};
 /** minor version number. */
-uint16_t FRVT_STRUCTS_MINOR_VERSION{2};
+uint16_t FRVT_STRUCTS_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_FRVT_STRUCTS_VERSION */
 }
 

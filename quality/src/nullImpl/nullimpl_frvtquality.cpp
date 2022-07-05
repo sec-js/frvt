@@ -40,22 +40,23 @@ NullImplFRVTQuality::scalarQuality(
 
 ReturnStatus
 NullImplFRVTQuality::vectorQuality(
-    const FRVT::Image &face,
-    std::vector<FRVT::QualityElementValues> &qualityVector,
-    std::vector<FRVT::EyePair> &eyeCoordinates)
+    const FRVT::Image &image,
+    std::vector<FRVT::ImageQualityAssessment> &assessVector)
 {
     std::uniform_real_distribution<double> dist(-90, 90); 
     std::mt19937 rng; 
     rng.seed(std::random_device{}()); 
-    
+   
     for (int i = 0; i < rand() % 3; i++) {
-        QualityElementValues qualityMap;
-        qualityMap[QualityElement::SubjectPoseYaw] = dist(rng);
-        qualityMap[QualityElement::SubjectPosePitch] = dist(rng);
-        qualityMap[QualityElement::SubjectPoseRoll] = dist(rng);    
-        qualityVector.push_back(qualityMap);
-        eyeCoordinates.push_back(EyePair(true, true, 50+i, 25+i, 20+i, 25+i));
+        FRVT::QualityAssessments qualityMap;
+        qualityMap[QualityItem::SubjectPoseYaw] = dist(rng);
+        qualityMap[QualityItem::SubjectPosePitch] = dist(rng);
+        qualityMap[QualityItem::SubjectPoseRoll] = dist(rng);    
+        FRVT::BoundingBox bb{int16_t(1*i), int16_t(2*i), 100, 120};
+//        FRVT::ImageQualityAssessment qa(bb, qualityMap);
+        assessVector.push_back(ImageQualityAssessment(bb, qualityMap));
     }
+    
     return ReturnStatus(ReturnCode::Success);
 }
 

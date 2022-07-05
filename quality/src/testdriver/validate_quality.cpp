@@ -49,8 +49,8 @@ runQuality(
     if (action == Action::ScalarQ)
         logStream << "id image returnCode quality" << endl;
     else if (action == Action::VectorQ) {
-        logStream << "id image returnCode numDetections detectionIndex eyesXleft eyesYleft eyesXright eyesYright ";
-        for (QualityElement e = QualityElement::Begin; e != QualityElement::End; ++e) {
+        logStream << "id image returnCode numDetections detectionIndex bb_xleft bb_ytop bb_width bb_height ";
+        for (QualityItem e = QualityItem::Begin; e != QualityItem::End; ++e) {
             logStream << e << " "; 
         }
         logStream << endl;
@@ -68,12 +68,11 @@ runQuality(
 
         Image face{image};
         double quality{-1.0};
-        vector<QualityElementValues> qualityVector;
-        vector<EyePair> eyeCoordinates;
+        vector<ImageQualityAssessment> qualityVector;
         if (action == Action::ScalarQ) 
             ret = implPtr->scalarQuality(face, quality);
         else if (action == Action::VectorQ)
-            ret = implPtr->vectorQuality(face, qualityVector, eyeCoordinates);
+            ret = implPtr->vectorQuality(face, qualityVector);
         
         /* If function is not implemented, clean up and exit */
         if (ret.code == ReturnCode::NotImplemented) {
@@ -86,19 +85,16 @@ runQuality(
                 << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " "
                 << quality << endl;
         } else if (action == Action::VectorQ) {
-            /* There needs to be the same number of eye
-             * coordinate entries as quality entries 
-             */
             auto numDetections = qualityVector.size();
-            if (eyeCoordinates.size() != numDetections) {
-                cerr << "[ERROR] The number of eye coordinates and face detections returned are not the same.  Please fix." << endl;
-                raise(SIGTERM);     
-            }
             if (ret.code != ReturnCode::Success || numDetections == 0) {
                 logStream << id << " "
                     << imagePath << " "
                     << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " "
-                    << "0 NA 0 0 0 0 NA NA NA NA NA" << endl;
+                    << "0 NA -1 -1 -1 -1";
+                    for (QualityItem e = QualityItem::Begin; e != QualityItem::End; ++e) {
+                        logStream << " NA"; 
+                    }
+                    logStream << endl;
             } else {
                 for (unsigned int i = 0; i < numDetections; i++) {
                     logStream << id << " "
@@ -106,12 +102,11 @@ runQuality(
                         << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " "
                         << numDetections << " ";
 
-                    auto detection = qualityVector[i];
-                    auto eyes = eyeCoordinates[i];
+                    auto detection = qualityVector[i].qAssessments;
+                    auto bb = qualityVector[i].boundingBox; 
                     logStream << i << " "
-                        << ((eyes.isLeftAssigned) ? (to_string(eyes.xleft) + " " + to_string(eyes.yleft) + " ") : "NA NA ")
-                        << ((eyes.isRightAssigned) ? (to_string(eyes.xright) + " " + to_string(eyes.yright)) : "NA NA");
-                        for (QualityElement e = QualityElement::Begin; e != QualityElement::End; ++e) {
+                        << (to_string(bb.xleft)) << " " << (to_string(bb.ytop)) << " " << (to_string(bb.width)) << " " << (to_string(bb.height));
+                        for (QualityItem e = QualityItem::Begin; e != QualityItem::End; ++e) {
                             auto it = detection.find(e);
                             logStream << " " << ((it != detection.end()) ? to_string(it->second) : "NA");
                         }
@@ -153,8 +148,8 @@ main(
 
     uint16_t currAPIMajorVersion{2},
         currAPIMinorVersion{0},
-        currStructsMajorVersion{1},
-        currStructsMinorVersion{2};
+        currStructsMajorVersion{2},
+        currStructsMinorVersion{0};
 
     /* Check versioning of both frvt_structs.h and API header file */
     if ((FRVT::FRVT_STRUCTS_MAJOR_VERSION != currStructsMajorVersion) ||

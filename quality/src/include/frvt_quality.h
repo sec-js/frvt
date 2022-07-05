@@ -71,35 +71,26 @@ public:
         double &quality) = 0;
 
     /**
-     * @brief This function takes an image and outputs 1) a vector
-     * that contains quality element values for each face detected
-     * in the image and 2) a vector of eye coordinates corresponding
-     * to each face detected in the image.
+     * @brief  This function takes an image and outputs
+     * 1) a vector that contains quality items for each
+     * 2) location
+     * for each face detected in the image
      *
-     * @param[in] face
+     * @param[in] image
      * Single face image
-     * @param[out] qualityVector
-     * A vector of QualityElementValues.  This will initially be an empty
-     * vector when passed into the function, and the implementation should
-     * populate it with the appropriate number of entries.  Each entry in
-     * the vector should contain a set of quality element values associated with 
-     * each face detected in the image.  Each QualityElementValues object should 
-     * be populated with quality elements that have been implemented by the developer.  
-     * Developers are only asked to provide values for those quality elements that they
-     * have implemented.
-     * @param[out] eyeCoordinates
-     * For each face detected in the image, the function should return the estimated
-     * eye centers.  This will initially be an empty vector when passed into the function, and
-     * the implementation should populate it with the appropriate number of entries.
-     * Values in eyeCoordinates[i] should correspond to the face quality elements in
-     * qualityVector[i].
-     * 
+     *
+     * @param[out] assessVector
+     * A vector of ImageQualityAssessments.  On entry, an empty
+     * vector. The implementation should populate it with zero or
+     * more entries. Each entry in the vector should contain a tight
+     * bounding box and a set of quality values.
+     * Each QualityAssessments object should be populated with
+     * those quality items that the developer chooses to implement.
      */ 
     virtual FRVT::ReturnStatus
     vectorQuality(
-        const FRVT::Image &face,
-        std::vector<FRVT::QualityElementValues> &qualityVector,
-        std::vector<FRVT::EyePair> &eyeCoordinates) = 0;
+        const FRVT::Image &image,
+        std::vector<FRVT::ImageQualityAssessment> &assessVector) = 0;
 
     /**
      * @brief

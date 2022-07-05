@@ -33,9 +33,8 @@ public:
 
     FRVT::ReturnStatus
     vectorQuality(
-        const FRVT::Image &face,
-        std::vector<FRVT::QualityElementValues> &qualityVector,
-        std::vector<FRVT::EyePair> &eyeCoordinates) override;
+        const FRVT::Image &image,
+        std::vector<FRVT::ImageQualityAssessment> &assessVector) override;
 
     static std::shared_ptr<FRVT_QUALITY::Interface>
     getImplementation();
