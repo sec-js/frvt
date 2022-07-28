@@ -9,3 +9,13 @@
 1303 ../common/images/multi1.ppm PHOTOJOURNALISM
 1305 ../common/images/multi2.ppm WILD
 1318 ../common/images/multi3.ppm WILD
+1141 ../common/images/white.ppm UNKNOWN
+1143 ../common/images/black.ppm UNKNOWN
+1145 ../common/images/8bit.pgm UNKNOWN
+1147 ../common/images/big.ppm PHOTOJOURNALISM
+1149 ../common/images/eyesClosed.ppm PHOTOJOURNALISM
+1151 ../common/images/multi1.ppm PHOTOJOURNALISM
+1153 ../common/images/multi2.ppm WILD
+1155 ../common/images/rotated180.ppm UNKNOWN
+1157 ../common/images/rotated90.ppm UNKNOWN
+1159 ../common/images/small.ppm UNKNOWN
