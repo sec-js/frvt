@@ -49,8 +49,8 @@ runQuality(
     if (action == Action::ScalarQ)
         logStream << "id image returnCode quality" << endl;
     else if (action == Action::VectorQ) {
-        logStream << "id image returnCode numDetections detectionIndex bb_xleft bb_ytop bb_width bb_height ";
-        for (QualityItem e = QualityItem::Begin; e != QualityItem::End; ++e) {
+        logStream << "id image returnCode bb_xleft bb_ytop bb_width bb_height ";
+        for (QualityMeasure e = QualityMeasure::Begin; e != QualityMeasure::End; ++e) {
             logStream << e << " "; 
         }
         logStream << endl;
@@ -68,11 +68,11 @@ runQuality(
 
         Image face{image};
         double quality{-1.0};
-        vector<ImageQualityAssessment> qualityVector;
+        ImageQualityAssessment assessments;
         if (action == Action::ScalarQ) 
             ret = implPtr->scalarQuality(face, quality);
         else if (action == Action::VectorQ)
-            ret = implPtr->vectorQuality(face, qualityVector);
+            ret = implPtr->vectorQuality(face, assessments);
         
         /* If function is not implemented, clean up and exit */
         if (ret.code == ReturnCode::NotImplemented) {
@@ -85,35 +85,18 @@ runQuality(
                 << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " "
                 << quality << endl;
         } else if (action == Action::VectorQ) {
-            auto numDetections = qualityVector.size();
-            if (ret.code != ReturnCode::Success || numDetections == 0) {
-                logStream << id << " "
-                    << imagePath << " "
-                    << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " "
-                    << "0 NA -1 -1 -1 -1";
-                    for (QualityItem e = QualityItem::Begin; e != QualityItem::End; ++e) {
-                        logStream << " NA"; 
-                    }
-                    logStream << endl;
-            } else {
-                for (unsigned int i = 0; i < numDetections; i++) {
-                    logStream << id << " "
-                        << imagePath << " "
-                        << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " "
-                        << numDetections << " ";
+            logStream << id << " "
+                << imagePath << " "
+                << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " ";
 
-                    auto detection = qualityVector[i].qAssessments;
-                    auto bb = qualityVector[i].boundingBox; 
-                    logStream << i << " "
-                        << (to_string(bb.xleft)) << " " << (to_string(bb.ytop)) << " " << (to_string(bb.width)) << " " << (to_string(bb.height));
-                        for (QualityItem e = QualityItem::Begin; e != QualityItem::End; ++e) {
-                            auto it = detection.find(e);
-                            logStream << " " << ((it != detection.end()) ? to_string(it->second) : "NA");
-                        }
-                    logStream << endl;
-                }
+            auto detection = assessments.qAssessments;
+            auto bb = assessments.boundingBox; 
+            logStream << (to_string(bb.xleft)) << " " << (to_string(bb.ytop)) << " " << (to_string(bb.width)) << " " << (to_string(bb.height));
+            for (QualityMeasure e = QualityMeasure::Begin; e != QualityMeasure::End; ++e) {
+                auto it = detection.find(e);
+                logStream << " " << ((it != detection.end()) ? to_string(it->second) : "NA");
             }
-
+            logStream << endl;
         }
     }
     inputStream.close();

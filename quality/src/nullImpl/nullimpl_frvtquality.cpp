@@ -41,21 +41,25 @@ NullImplFRVTQuality::scalarQuality(
 ReturnStatus
 NullImplFRVTQuality::vectorQuality(
     const FRVT::Image &image,
-    std::vector<FRVT::ImageQualityAssessment> &assessVector)
+    FRVT::ImageQualityAssessment &assessments)
 {
     std::uniform_real_distribution<double> dist(-90, 90); 
     std::mt19937 rng; 
     rng.seed(std::random_device{}()); 
-   
-    for (int i = 0; i < rand() % 3; i++) {
-        FRVT::QualityAssessments qualityMap;
-        qualityMap[QualityItem::SubjectPoseYaw] = dist(rng);
-        qualityMap[QualityItem::SubjectPosePitch] = dist(rng);
-        qualityMap[QualityItem::SubjectPoseRoll] = dist(rng);    
-        FRVT::BoundingBox bb{int16_t(1*i), int16_t(2*i), 100, 120};
-//        FRVT::ImageQualityAssessment qa(bb, qualityMap);
-        assessVector.push_back(ImageQualityAssessment(bb, qualityMap));
+  
+    auto numFaces = rand() % 3; 
+    FRVT::QualityAssessments qualityMap;
+    qualityMap[QualityMeasure::TotalFacesPresent] = numFaces;
+    if (numFaces == 0) {
+        return ReturnStatus(ReturnCode::FaceDetectionError);
     }
+
+    qualityMap[QualityMeasure::SubjectPoseYaw] = dist(rng);
+    qualityMap[QualityMeasure::SubjectPosePitch] = dist(rng);
+    qualityMap[QualityMeasure::SubjectPoseRoll] = dist(rng);    
+    FRVT::BoundingBox bb{int16_t(1), int16_t(2), 100, 120};
+    assessments.boundingBox = bb;
+    assessments.qAssessments = qualityMap;
     
     return ReturnStatus(ReturnCode::Success);
 }

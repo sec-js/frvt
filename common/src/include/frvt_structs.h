@@ -351,11 +351,12 @@ enum class ImageLabel {
     Scanned
 };
 
-/** Quality element labels 
+/** Quality measure labels 
  */
-enum class QualityItem {
+enum class QualityMeasure {
     Begin = 0,
-    SubjectPoseRoll = Begin,
+    TotalFacesPresent = Begin,
+    SubjectPoseRoll,
     SubjectPosePitch,
     SubjectPoseYaw,
     EyeGlassesPresent,
@@ -364,69 +365,80 @@ enum class QualityItem {
     Overexposure,
     BackgroundUniformity,
     MouthOpen,
+    EyesOpen,
     FaceOcclusion,
     Resolution,
     InterocularDistance,
+    MotionBlur,
+    CompressionArtifacts,
     PixelsFromHeadToLeftEdge,
     PixelsFromHeadToRightEdge,
     PixelsFromChinToBottom,
     PixelsFromHeadToTop,
-    ScalarQualityValue,
+    UnifiedQualityScore,
     End
 };
 
-/** To support iterating over QualityItem enum values */
-inline QualityItem& 
-operator++(QualityItem& qe) {
-   if (qe == QualityItem::End) 
-        throw std::out_of_range("QualityItem& operator++(QualityItem&)");
-    qe = QualityItem(static_cast<std::underlying_type<QualityItem>::type>(qe) + 1);
+/** To support iterating over QualityMeasure enum values */
+inline QualityMeasure& 
+operator++(QualityMeasure& qe) {
+   if (qe == QualityMeasure::End) 
+        throw std::out_of_range("QualityMeasure& operator++(QualityMeasure&)");
+    qe = QualityMeasure(static_cast<std::underlying_type<QualityMeasure>::type>(qe) + 1);
     return qe;
 }
 
-/** Output stream operator for QualityItem enum. */
+/** Output stream operator for QualityMeasure enum. */
 inline std::ostream&
 operator<<(
     std::ostream &s,
-    const QualityItem &qe)
+    const QualityMeasure &qe)
 {
     switch (qe) {
-    case QualityItem::SubjectPosePitch:
-        return (s << "subjectPosePitch");
-    case QualityItem::SubjectPoseRoll:
-        return (s << "subjectPoseRoll");
-    case QualityItem::SubjectPoseYaw:
-        return (s << "subjectPoseYaw");
-    case QualityItem::EyeGlassesPresent:
-        return (s << "eyeGlassesPresent");
-    case QualityItem::SunGlassesPresent:
-        return (s << "sunGlassesPresent");
-    case QualityItem::Underexposure:
-        return (s << "underexposure");
-    case QualityItem::Overexposure:
-        return (s << "overexposure");
-    case QualityItem::BackgroundUniformity:
-        return (s << "backgroundUniformity");
-    case QualityItem::MouthOpen:
-        return (s << "mouthOpen");
-    case QualityItem::FaceOcclusion:
-        return (s << "faceOcclusion");
-    case QualityItem::Resolution:
-        return (s << "resolution");
-    case QualityItem::InterocularDistance:
-        return (s << "interocularDistance");
-    case QualityItem::PixelsFromHeadToLeftEdge:
-        return (s << "pixelsFromHeadToLeftEdge");
-    case QualityItem::PixelsFromHeadToRightEdge:
-        return (s << "pixelsFromHeadToRightEdge");
-    case QualityItem::PixelsFromChinToBottom:
-        return (s << "pixelsFromChinToBottom");
-    case QualityItem::PixelsFromHeadToTop:
-        return (s << "pixelsFromHeadToTop");
-    case QualityItem::ScalarQualityValue:
-        return (s << "scalarQualityValue");
+    case QualityMeasure::TotalFacesPresent:
+        return (s << "TotalFacesPresent");
+    case QualityMeasure::SubjectPoseRoll:
+        return (s << "SubjectPoseRoll");
+    case QualityMeasure::SubjectPosePitch:
+        return (s << "SubjectPosePitch");
+    case QualityMeasure::SubjectPoseYaw:
+        return (s << "SubjectPoseYaw");
+    case QualityMeasure::EyeGlassesPresent:
+        return (s << "EyeGlassesPresent");
+    case QualityMeasure::SunGlassesPresent:
+        return (s << "SunGlassesPresent");
+    case QualityMeasure::Underexposure:
+        return (s << "Underexposure");
+    case QualityMeasure::Overexposure:
+        return (s << "Overexposure");
+    case QualityMeasure::BackgroundUniformity:
+        return (s << "BackgroundUniformity");
+    case QualityMeasure::MouthOpen:
+        return (s << "MouthOpen");
+    case QualityMeasure::EyesOpen:
+        return (s << "EyesOpen");
+    case QualityMeasure::FaceOcclusion:
+        return (s << "FaceOcclusion");
+    case QualityMeasure::Resolution:
+        return (s << "Resolution");
+    case QualityMeasure::InterocularDistance:
+        return (s << "InterocularDistance");
+    case QualityMeasure::MotionBlur:
+        return (s << "MotionBlur");
+    case QualityMeasure::CompressionArtifacts:
+        return (s << "CompressionArtifacts");
+    case QualityMeasure::PixelsFromHeadToLeftEdge:
+        return (s << "PixelsFromHeadToLeftEdge");
+    case QualityMeasure::PixelsFromHeadToRightEdge:
+        return (s << "PixelsFromHeadToRightEdge");
+    case QualityMeasure::PixelsFromChinToBottom:
+        return (s << "PixelsFromChinToBottom");
+    case QualityMeasure::PixelsFromHeadToTop:
+        return (s << "PixelsFromHeadToTop");
+    case QualityMeasure::UnifiedQualityScore:
+        return (s << "UnifiedQualityScore");
     default:
-        return (s << "undefined QualityItem");
+        return (s << "undefined QualityMeasure");
     }
 }
 
@@ -435,7 +447,7 @@ operator<<(
  * Data structure that stores key-value pairs, with each
  * entry representing a quality element and its value 
  */
-using QualityAssessments = std::map<QualityItem, double>;
+using QualityAssessments = std::map<QualityMeasure, double>;
 
 typedef struct BoundingBox
 {

@@ -72,25 +72,23 @@ public:
 
     /**
      * @brief  This function takes an image and outputs
-     * 1) a vector that contains quality items for each
-     * 2) location
-     * for each face detected in the image
+     * face location and quality information. The quality assessment   
+     * should be performed on the largest detected face.
      *
      * @param[in] image
      * Single face image
      *
-     * @param[out] assessVector
-     * A vector of ImageQualityAssessments.  On entry, an empty
-     * vector. The implementation should populate it with zero or
-     * more entries. Each entry in the vector should contain a tight
-     * bounding box and a set of quality values.
-     * Each QualityAssessments object should be populated with
-     * those quality items that the developer chooses to implement.
+     * @param[out] assessments
+     * An ImageQualityAssessments structure. 
+     * The implementation should populate
+     * 1) the bounding box and
+     * 2) those items in the QualityAssessments object that the
+     * developer chooses to implement
      */ 
     virtual FRVT::ReturnStatus
     vectorQuality(
         const FRVT::Image &image,
-        std::vector<FRVT::ImageQualityAssessment> &assessVector) = 0;
+        FRVT::ImageQualityAssessment &assessments) = 0;
 
     /**
      * @brief

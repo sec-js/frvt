@@ -34,7 +34,7 @@ public:
     FRVT::ReturnStatus
     vectorQuality(
         const FRVT::Image &image,
-        std::vector<FRVT::ImageQualityAssessment> &assessVector) override;
+        FRVT::ImageQualityAssessment &assessments) override;
 
     static std::shared_ptr<FRVT_QUALITY::Interface>
     getImplementation();
