@@ -368,7 +368,7 @@ enum class QualityMeasure {
     EyesOpen,
     FaceOcclusion,
     Resolution,
-    InterocularDistance,
+    InterEyeDistance,
     MotionBlur,
     CompressionArtifacts,
     PixelsFromHeadToLeftEdge,
@@ -421,8 +421,8 @@ operator<<(
         return (s << "FaceOcclusion");
     case QualityMeasure::Resolution:
         return (s << "Resolution");
-    case QualityMeasure::InterocularDistance:
-        return (s << "InterocularDistance");
+    case QualityMeasure::InterEyeDistance:
+        return (s << "InterEyeDistance");
     case QualityMeasure::MotionBlur:
         return (s << "MotionBlur");
     case QualityMeasure::CompressionArtifacts:
