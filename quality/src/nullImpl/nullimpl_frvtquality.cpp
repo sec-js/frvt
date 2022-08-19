@@ -10,6 +10,7 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <random>
 
 #include "nullimpl_frvtquality.h"
 
@@ -24,16 +25,43 @@ NullImplFRVTQuality::~NullImplFRVTQuality() {}
 ReturnStatus
 NullImplFRVTQuality::initialize(const std::string &configDir)
 {
+    // Read stuff (models, etc.) in from configDir
     return ReturnStatus(ReturnCode::Success);
 }
 
 ReturnStatus
 NullImplFRVTQuality::scalarQuality(
-		const FRVT::Image &face,
-		double &quality)
+    const FRVT::Image &face,
+    double &quality)
 {
-	quality = 88.03;
-	return ReturnStatus(ReturnCode::Success);
+    quality = (rand() % 100) + 1; 
+    return ReturnStatus(ReturnCode::Success);
+}
+
+ReturnStatus
+NullImplFRVTQuality::vectorQuality(
+    const FRVT::Image &image,
+    FRVT::ImageQualityAssessment &assessments)
+{
+    std::uniform_real_distribution<double> dist(-90, 90); 
+    std::mt19937 rng; 
+    rng.seed(std::random_device{}()); 
+  
+    auto numFaces = rand() % 3; 
+    FRVT::QualityAssessments qualityMap;
+    qualityMap[QualityMeasure::TotalFacesPresent] = numFaces;
+    if (numFaces == 0) {
+        return ReturnStatus(ReturnCode::FaceDetectionError);
+    }
+
+    qualityMap[QualityMeasure::SubjectPoseYaw] = dist(rng);
+    qualityMap[QualityMeasure::SubjectPosePitch] = dist(rng);
+    qualityMap[QualityMeasure::SubjectPoseRoll] = dist(rng);    
+    FRVT::BoundingBox bb{int16_t(1), int16_t(2), 100, 120};
+    assessments.boundingBox = bb;
+    assessments.qAssessments = qualityMap;
+    
+    return ReturnStatus(ReturnCode::Success);
 }
 
 std::shared_ptr<Interface>
@@ -41,8 +69,4 @@ Interface::getImplementation()
 {
     return std::make_shared<NullImplFRVTQuality>();
 }
-
-
-
-
 

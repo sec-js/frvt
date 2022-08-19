@@ -28,8 +28,13 @@ public:
 
     FRVT::ReturnStatus
     scalarQuality(
-		const FRVT::Image &face,
-		double &quality) override;
+        const FRVT::Image &face,
+        double &quality) override;
+
+    FRVT::ReturnStatus
+    vectorQuality(
+        const FRVT::Image &image,
+        FRVT::ImageQualityAssessment &assessments) override;
 
     static std::shared_ptr<FRVT_QUALITY::Interface>
     getImplementation();

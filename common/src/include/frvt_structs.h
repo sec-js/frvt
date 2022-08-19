@@ -17,6 +17,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <map>
 
 namespace FRVT {
 /**
@@ -195,7 +196,7 @@ operator<<(
     case ReturnCode::MatchError:
         return (s << "Error occurred during the 1:1 match operation");
     case ReturnCode::QualityAssessmentError:
-	return (s << "Failure to generate a quality score on the input image");
+    return (s << "Failure to generate a quality score on the input image");
     case ReturnCode::NotImplemented:
         return (s << "Function is not implemented");
     case ReturnCode::VendorError:
@@ -224,9 +225,9 @@ typedef struct ReturnStatus {
     std::string info;
 
     ReturnStatus() :
-    	code{ReturnCode::UnknownError},
-	info{""}
-    	{}
+        code{ReturnCode::UnknownError},
+        info{""}
+        {}
     /**
      * @brief
      * Create a ReturnStatus object.
@@ -255,12 +256,12 @@ typedef struct EyePair
      * assigned successfully, this value should be set to true,
      * otherwise false. */
     bool isRightAssigned;
-    /** X and Y coordinate of the center of the subject's left eye.  If the
+    /** X and Y coordinate of the midpoint between the two canthi of the subject's left eye.  If the
      * eye coordinate is out of range (e.g. x < 0 or x >= width), isLeftAssigned
      * should be set to false, and the left eye coordinates will be ignored. */
     uint16_t xleft;
     uint16_t yleft;
-    /** X and Y coordinate of the center of the subject's right eye.  If the
+    /** X and Y coordinate of the midpoint between the two canthi of the subject's right eye.  If the
      * eye coordinate is out of range (e.g. x < 0 or x >= width), isRightAssigned
      * should be set to false, and the right eye coordinates will be ignored. */
     uint16_t xright;
@@ -350,12 +351,160 @@ enum class ImageLabel {
     Scanned
 };
 
-/*
- * Versioning
- *
- * NIST code will extern the version number symbols. Participant
- * shall compile them into their core library.
+/** Quality measure labels 
  */
+enum class QualityMeasure {
+    Begin = 0,
+    TotalFacesPresent = Begin,
+    SubjectPoseRoll,
+    SubjectPosePitch,
+    SubjectPoseYaw,
+    EyeGlassesPresent,
+    SunGlassesPresent,
+    Underexposure,
+    Overexposure,
+    BackgroundUniformity,
+    MouthOpen,
+    EyesOpen,
+    FaceOcclusion,
+    Resolution,
+    InterEyeDistance,
+    MotionBlur,
+    CompressionArtifacts,
+    PixelsFromHeadToLeftEdge,
+    PixelsFromHeadToRightEdge,
+    PixelsFromChinToBottom,
+    PixelsFromHeadToTop,
+    UnifiedQualityScore,
+    End
+};
+
+/** To support iterating over QualityMeasure enum values */
+inline QualityMeasure& 
+operator++(QualityMeasure& qe) {
+   if (qe == QualityMeasure::End) 
+        throw std::out_of_range("QualityMeasure& operator++(QualityMeasure&)");
+    qe = QualityMeasure(static_cast<std::underlying_type<QualityMeasure>::type>(qe) + 1);
+    return qe;
+}
+
+/** Output stream operator for QualityMeasure enum. */
+inline std::ostream&
+operator<<(
+    std::ostream &s,
+    const QualityMeasure &qe)
+{
+    switch (qe) {
+    case QualityMeasure::TotalFacesPresent:
+        return (s << "TotalFacesPresent");
+    case QualityMeasure::SubjectPoseRoll:
+        return (s << "SubjectPoseRoll");
+    case QualityMeasure::SubjectPosePitch:
+        return (s << "SubjectPosePitch");
+    case QualityMeasure::SubjectPoseYaw:
+        return (s << "SubjectPoseYaw");
+    case QualityMeasure::EyeGlassesPresent:
+        return (s << "EyeGlassesPresent");
+    case QualityMeasure::SunGlassesPresent:
+        return (s << "SunGlassesPresent");
+    case QualityMeasure::Underexposure:
+        return (s << "Underexposure");
+    case QualityMeasure::Overexposure:
+        return (s << "Overexposure");
+    case QualityMeasure::BackgroundUniformity:
+        return (s << "BackgroundUniformity");
+    case QualityMeasure::MouthOpen:
+        return (s << "MouthOpen");
+    case QualityMeasure::EyesOpen:
+        return (s << "EyesOpen");
+    case QualityMeasure::FaceOcclusion:
+        return (s << "FaceOcclusion");
+    case QualityMeasure::Resolution:
+        return (s << "Resolution");
+    case QualityMeasure::InterEyeDistance:
+        return (s << "InterEyeDistance");
+    case QualityMeasure::MotionBlur:
+        return (s << "MotionBlur");
+    case QualityMeasure::CompressionArtifacts:
+        return (s << "CompressionArtifacts");
+    case QualityMeasure::PixelsFromHeadToLeftEdge:
+        return (s << "PixelsFromHeadToLeftEdge");
+    case QualityMeasure::PixelsFromHeadToRightEdge:
+        return (s << "PixelsFromHeadToRightEdge");
+    case QualityMeasure::PixelsFromChinToBottom:
+        return (s << "PixelsFromChinToBottom");
+    case QualityMeasure::PixelsFromHeadToTop:
+        return (s << "PixelsFromHeadToTop");
+    case QualityMeasure::UnifiedQualityScore:
+        return (s << "UnifiedQualityScore");
+    default:
+        return (s << "undefined QualityMeasure");
+    }
+}
+
+/**
+ * @brief
+ * Data structure that stores key-value pairs, with each
+ * entry representing a quality element and its value 
+ */
+using QualityAssessments = std::map<QualityMeasure, double>;
+
+typedef struct BoundingBox
+{
+    /** @brief leftmost point on head, typically subject's right ear
+     *  value must be on [0, imageWidth-1] */
+    int16_t xleft; 
+    /** @brief high point of head, typically top of hair;
+     *  value must be on [0, imageHeight-1] */           
+    int16_t ytop;
+    /** @brief bounding box width */ 
+    int16_t width;
+    /** @brief bounding box height */
+    int16_t height;
+
+    BoundingBox() :
+        xleft{-1},
+        ytop{-1},
+        width{-1},
+        height{-1}
+        {}
+
+    BoundingBox(
+        int16_t xleft,
+        int16_t ytop,
+        int16_t width,
+        int16_t height) :
+        xleft{xleft},
+        ytop{ytop},
+        width{width},
+        height{height}
+        {}
+} BoundingBox;
+
+typedef struct ImageQualityAssessment
+{
+    BoundingBox boundingBox;
+    QualityAssessments qAssessments; 
+    
+    ImageQualityAssessment() :
+        boundingBox{},
+        qAssessments{}
+        {}
+
+    ImageQualityAssessment(
+        const BoundingBox &boundingBox,
+        const QualityAssessments &qAssessments) :
+        boundingBox{boundingBox},
+        qAssessments{qAssessments}
+        {}
+} ImageQualityAssessment;
+
+/*
+* Versioning
+*
+* NIST code will extern the version number symbols. Participant
+* shall compile them into their core library.
+*/
 #ifdef NIST_EXTERN_FRVT_STRUCTS_VERSION
 /** major version number. */
 extern uint16_t FRVT_STRUCTS_MAJOR_VERSION;
@@ -363,9 +512,9 @@ extern uint16_t FRVT_STRUCTS_MAJOR_VERSION;
 extern uint16_t FRVT_STRUCTS_MINOR_VERSION;
 #else /* NIST_EXTERN_FRVT_STRUCTS_VERSION */
 /** major version number. */
-uint16_t FRVT_STRUCTS_MAJOR_VERSION{1};
+uint16_t FRVT_STRUCTS_MAJOR_VERSION{2};
 /** minor version number. */
-uint16_t FRVT_STRUCTS_MINOR_VERSION{2};
+uint16_t FRVT_STRUCTS_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_FRVT_STRUCTS_VERSION */
 }
 

@@ -26,9 +26,10 @@ using namespace FRVT_QUALITY;
 
 int
 runQuality(
-        std::shared_ptr<Interface> &implPtr,
-        const string &inputFile,
-        const string &outputLog)
+    std::shared_ptr<Interface> &implPtr,
+    const string &inputFile,
+    const string &outputLog,
+    Action action)
 {
     /* Read input file */
     ifstream inputStream(inputFile);
@@ -45,9 +46,18 @@ runQuality(
     }
 
     /* header */
-    logStream << "id image returnCode quality" << endl;
+    if (action == Action::ScalarQ)
+        logStream << "id image returnCode quality" << endl;
+    else if (action == Action::VectorQ) {
+        logStream << "id image returnCode bb_xleft bb_ytop bb_width bb_height ";
+        for (QualityMeasure e = QualityMeasure::Begin; e != QualityMeasure::End; ++e) {
+            logStream << e << " "; 
+        }
+        logStream << endl;
+    }       
 
     string id, imagePath, desc;
+    ReturnStatus ret;
     while (inputStream >> id >> imagePath >> desc) {
         Image image;
         if (!readImage(imagePath, image)) {
@@ -58,14 +68,36 @@ runQuality(
 
         Image face{image};
         double quality{-1.0};
-        auto ret = implPtr->scalarQuality(face, quality);
+        ImageQualityAssessment assessments;
+        if (action == Action::ScalarQ) 
+            ret = implPtr->scalarQuality(face, quality);
+        else if (action == Action::VectorQ)
+            ret = implPtr->vectorQuality(face, assessments);
+        
+        /* If function is not implemented, clean up and exit */
+        if (ret.code == ReturnCode::NotImplemented) {
+            break;
+        }
 
-        /* Write output to log */
-        logStream << id << " "
+        if (action == Action::ScalarQ) {
+            logStream << id << " "
                 << imagePath << " "
                 << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " "
-                << quality
-                << endl;
+                << quality << endl;
+        } else if (action == Action::VectorQ) {
+            logStream << id << " "
+                << imagePath << " "
+                << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " ";
+
+            auto detection = assessments.qAssessments;
+            auto bb = assessments.boundingBox; 
+            logStream << (to_string(bb.xleft)) << " " << (to_string(bb.ytop)) << " " << (to_string(bb.width)) << " " << (to_string(bb.height));
+            for (QualityMeasure e = QualityMeasure::Begin; e != QualityMeasure::End; ++e) {
+                auto it = detection.find(e);
+                logStream << " " << ((it != detection.end()) ? to_string(it->second) : "NA");
+            }
+            logStream << endl;
+        }
     }
     inputStream.close();
 
@@ -73,6 +105,13 @@ runQuality(
     if( remove(inputFile.c_str()) != 0 )
         cerr << "Error deleting file: " << inputFile << endl;
 
+    if (ret.code == ReturnCode::NotImplemented) {
+        /* Remove the output file */
+        logStream.close();
+        if( remove(outputLog.c_str()) != 0 )
+            cerr << "Error deleting file: " << outputLog << endl;
+        return NOT_IMPLEMENTED;
+    }
     return SUCCESS;
 }
 
@@ -90,39 +129,40 @@ main(
 {
     auto exitStatus = SUCCESS;
 
-    uint16_t currAPIMajorVersion{1},
-		currAPIMinorVersion{0},
-		currStructsMajorVersion{1},
-		currStructsMinorVersion{2};
+    uint16_t currAPIMajorVersion{2},
+        currAPIMinorVersion{0},
+        currStructsMajorVersion{2},
+        currStructsMinorVersion{0};
 
     /* Check versioning of both frvt_structs.h and API header file */
-	if ((FRVT::FRVT_STRUCTS_MAJOR_VERSION != currStructsMajorVersion) ||
-			(FRVT::FRVT_STRUCTS_MINOR_VERSION != currStructsMinorVersion)) {
-		cerr << "[ERROR] You've compiled your library with an old version of the frvt_structs.h file: version " <<
-		    FRVT::FRVT_STRUCTS_MAJOR_VERSION << "." <<
-		    FRVT::FRVT_STRUCTS_MINOR_VERSION <<
-		    ".  Please re-build with the latest version: " <<
-		    currStructsMajorVersion << "." <<
-	   	    currStructsMinorVersion << "." << endl;
-		return (FAILURE);
-	}
+    if ((FRVT::FRVT_STRUCTS_MAJOR_VERSION != currStructsMajorVersion) ||
+            (FRVT::FRVT_STRUCTS_MINOR_VERSION != currStructsMinorVersion)) {
+        cerr << "[ERROR] You've compiled your library with an old version of the frvt_structs.h file: version " <<
+            FRVT::FRVT_STRUCTS_MAJOR_VERSION << "." <<
+            FRVT::FRVT_STRUCTS_MINOR_VERSION <<
+            ".  Please re-build with the latest version: " <<
+            currStructsMajorVersion << "." <<
+            currStructsMinorVersion << "." << endl;
+        return (FAILURE);
+    }
 
-	if ((FRVT_QUALITY::API_MAJOR_VERSION != currAPIMajorVersion) ||
-			(FRVT_QUALITY::API_MINOR_VERSION != currAPIMinorVersion)) {
-		std::cerr << "[ERROR] You've compiled your library with an old version of the API header file: " <<
-		    FRVT_QUALITY::API_MAJOR_VERSION << "." <<
-		    FRVT_QUALITY::API_MINOR_VERSION <<
-		    ".  Please re-build with the latest version:" <<
-		    currAPIMajorVersion << "." <<
-		    currStructsMinorVersion << "." << endl;
-		return (FAILURE);
-	}
+    if ((FRVT_QUALITY::API_MAJOR_VERSION != currAPIMajorVersion) ||
+            (FRVT_QUALITY::API_MINOR_VERSION != currAPIMinorVersion)) {
+        cerr << "[ERROR] You've compiled your library with an old version of the API header file: " <<
+            FRVT_QUALITY::API_MAJOR_VERSION << "." <<
+            FRVT_QUALITY::API_MINOR_VERSION <<
+            ".  Please re-build with the latest version:" <<
+            currAPIMajorVersion << "." <<
+            currStructsMinorVersion << "." << endl;
+        return (FAILURE);
+    }
 
-    int requiredArgs = 1; /* exec name */
+    int requiredArgs = 2; /* exec name and action */
     if (argc < requiredArgs)
         usage(argv[0]);
 
-    string configDir{"config"},
+    string actionstr{argv[1]},
+        configDir{"config"},
         outputDir{"output"},
         outputFileStem{"stem"},
         inputFile;
@@ -145,6 +185,16 @@ main(
         }
     }
 
+    Action action = mapStringToAction[actionstr];
+    switch(action) {
+        case Action::ScalarQ:
+        case Action::VectorQ:
+            break;
+        default:
+            cerr << "Unknown command: " << actionstr << endl;
+            usage(argv[0]);
+    }
+
     /* Get implementation pointer */
     auto implPtr = Interface::getImplementation();
     /* Initialization */
@@ -165,23 +215,29 @@ main(
     bool parent = false;
     int i = 0;
     for (auto &inputFile : inputFileVector) {
-		/* Fork */
-		switch(fork()) {
-		case 0: /* Child */
-			return runQuality(
-					implPtr,
-					inputFile,
-					outputDir + "/" + outputFileStem + ".log." + to_string(i));
-		case -1: /* Error */
-		cerr << "Problem forking" << endl;
-		break;
-		default: /* Parent */
-			parent = true;
-			break;
-		}
-		i++;
+        /* Fork */
+        switch(fork()) {
+        case 0: /* Child */
+            switch (action) {
+                case Action::ScalarQ:
+                case Action::VectorQ:
+                    return runQuality(
+                        implPtr,
+                        inputFile,
+                        outputDir + "/" + outputFileStem + ".log." + to_string(i),
+                        action);
+                default:
+                    return FAILURE;
+            }
+        case -1: /* Error */
+        cerr << "Problem forking" << endl;
+        break;
+        default: /* Parent */
+            parent = true;
+            break;
+        }
+        i++;
     }
-
 
     /* Parent -- wait for children */
     if (parent) {
@@ -190,7 +246,7 @@ main(
             pid_t cpid;
 
             cpid = wait(&stat_val);
-            if (WIFEXITED(stat_val)) {}
+            if (WIFEXITED(stat_val)) { exitStatus = WEXITSTATUS(stat_val); }
             else if (WIFSIGNALED(stat_val)) {
                 cerr << "PID " << cpid << " exited due to signal " <<
                         WTERMSIG(stat_val) << endl;

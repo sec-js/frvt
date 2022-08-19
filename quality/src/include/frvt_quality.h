@@ -54,9 +54,9 @@ public:
      * via Image::Label, and it is up to the implementation to alter its behavior
      * based on the image type (e.g., Iso (full-frontal) versus Wild (off-angle).
      *
-     * param[in] face
+     * @param[in] face
      * Single face image
-     * param[out] quality
+     * @param[out] quality
      * A scalar value assessment of image quality.  The legal values are
      * [0,100] - The value should have a monotonic decreasing relationship with
      * false non-match rate anticipated for this sample if it was compared with
@@ -69,6 +69,26 @@ public:
     scalarQuality(
         const FRVT::Image &face,
         double &quality) = 0;
+
+    /**
+     * @brief  This function takes an image and outputs
+     * face location and quality information. The quality assessment   
+     * should be performed on the largest detected face.
+     *
+     * @param[in] image
+     * Single face image
+     *
+     * @param[out] assessments
+     * An ImageQualityAssessments structure. 
+     * The implementation should populate
+     * 1) the bounding box and
+     * 2) those items in the QualityAssessments object that the
+     * developer chooses to implement
+     */ 
+    virtual FRVT::ReturnStatus
+    vectorQuality(
+        const FRVT::Image &image,
+        FRVT::ImageQualityAssessment &assessments) = 0;
 
     /**
      * @brief
@@ -100,7 +120,7 @@ extern uint16_t API_MAJOR_VERSION;
 extern uint16_t API_MINOR_VERSION;
 #else /* NIST_EXTERN_API_VERSION */
 /** API major version number. */
-uint16_t API_MAJOR_VERSION{1};
+uint16_t API_MAJOR_VERSION{2};
 /** API minor version number. */
 uint16_t API_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_API_VERSION */
