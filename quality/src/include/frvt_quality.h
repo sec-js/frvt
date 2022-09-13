@@ -72,17 +72,14 @@ public:
 
     /**
      * @brief  This function takes an image and outputs
-     * face location and quality information. The quality assessment   
-     * should be performed on the largest detected face.
+     * quality information. 
      *
      * @param[in] image
      * Single face image
      *
      * @param[out] assessments
      * An ImageQualityAssessments structure. 
-     * The implementation should populate
-     * 1) the bounding box and
-     * 2) those items in the QualityAssessments object that the
+     * The implementation should populate those items in the QualityAssessments object that the
      * developer chooses to implement
      */ 
     virtual FRVT::ReturnStatus
