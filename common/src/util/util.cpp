@@ -191,6 +191,8 @@ std::map<std::string, Action> mapStringToAction =
     { "scalarImageQ", Action::ScalarImageQ },
     { "scalarSubjectQ", Action::ScalarSubjectQ },
     { "vectorQ", Action::VectorQ },
+    { "detectImpersonationPA", Action::DetectImpersonationPA },
+    { "detectEvasionPA", Action::DetectEvasionPA },
 };
 
 std::map<Action, std::string> mapActionToString =
@@ -222,6 +224,8 @@ std::map<Action, std::string> mapActionToString =
     { Action::ScalarImageQ, "scalarImageQ" },
     { Action::ScalarSubjectQ, "scalarSubjectQ" },
     { Action::VectorQ, "vectorQ" },
+    { Action::DetectImpersonationPA, "detectImpersonationPA" },
+    { Action::DetectEvasionPA, "detectEvasionPA" },
 };
 
 std::map<Action, FRVT::ImageLabel> mapActionToMorphLabel =

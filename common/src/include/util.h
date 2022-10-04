@@ -105,7 +105,10 @@ enum class Action {
 	ScalarQWithReference,
 	ScalarImageQ,
 	ScalarSubjectQ,
-	VectorQ
+	VectorQ,
+    /* PAD */
+    DetectImpersonationPA,
+    DetectEvasionPA
 };
 
 /**

@@ -1,0 +1,10 @@
+1 ../common/images/S001-01-t10_01.ppm UNKNOWN
+3 ../common/images/S001-03-t10_01.ppm UNKNOWN
+5 ../common/images/S001-05-t10_01.ppm UNKNOWN
+7 ../common/images/S001-07-t10_01.ppm UNKNOWN
+9 ../common/images/S001-08-t10_02.ppm UNKNOWN
+11 ../common/images/S001-09-t10_01.ppm UNKNOWN
+13 ../common/images/S003-01-t10_01.ppm UNKNOWN
+15 ../common/images/S005-01-t10_01.ppm UNKNOWN
+17 ../common/images/S006-02-t10_01.ppm UNKNOWN
+19 ../common/images/S007-01-t10_01.ppm UNKNOWN
