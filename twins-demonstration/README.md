@@ -1,10 +1,9 @@
 # FRVT twins demonstrations validation package
 
-##### Important #####
-FRVT twins demonstration track uses the FRVT 1:1 API
-You must download the FRVT 1:1 validation package before running the FRVT twins demonstration validation package.
-FRVT Twins demonstration track will not test the multiface version of createTemplate()
-#####################
+# Important 
+1) FRVT twins demonstration track uses the FRVT 1:1 API.
+2) You must download the FRVT 1:1 validation package before running the FRVT twins demonstration validation package.
+3) FRVT Twins demonstration track will not test the multiface version of createTemplate()
 
 The purpose of this validation package is to
 1) validate that your software adheres to the [FRVT 1:1 API](https://pages.nist.gov/frvt/api/FRVT_ongoing_11_api.pdf),
