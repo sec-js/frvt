@@ -53,10 +53,10 @@ NullImplFRVTPad::detectEvasionPA(
 {
     if((rand() % 5) == 0) {
         isPA = true;
-        score = rand()/(RAND_MAX - 1);
+        score = rand()/(double)(RAND_MAX - 1);
     } else {
         isPA = false;
-        score = -1.0 * (rand()/(RAND_MAX - 1));
+        score = -1.0 * (rand()/(double)(RAND_MAX - 1));
     }
 
     return ReturnStatus(ReturnCode::Success);
