@@ -10,6 +10,7 @@
 
 #include <cstring>
 #include <cstdlib>
+#include <utility>
 
 #include "nullimplfrvtpad.h"
 
@@ -32,9 +33,10 @@ ReturnStatus
 NullImplFRVTPad::detectImpersonationPA(
     const FRVT_PAD::Media &suspectedPA,
     bool &isPA,
-    double &score)
+    double &score,
+    std::vector< std::pair<std::string, std::string> > &decisionProperties)
 {
-    if((rand() % 3) == 0) {
+    if ((rand() % 3) == 0) {
         isPA = true;
         score = rand()/(double)(RAND_MAX - 1);
     } else {
@@ -42,6 +44,11 @@ NullImplFRVTPad::detectImpersonationPA(
         score = -1.0 * (rand()/(double)(RAND_MAX - 1));
     }
 
+    if (score > 0)
+        decisionProperties.push_back(std::make_pair("PA detected", "replay attack"));
+    else if (score > -0.09 && score < 0.09)
+        decisionProperties.push_back(std::make_pair("unable to make PA decision", "image resolution too low"));
+    
     return ReturnStatus(ReturnCode::Success);
 }
 
@@ -49,7 +56,8 @@ ReturnStatus
 NullImplFRVTPad::detectEvasionPA(
     const FRVT_PAD::Media &suspectedPA,
     bool &isPA,
-    double &score)
+    double &score,
+    std::vector< std::pair<std::string, std::string> > &decisionProperties)
 {
     if((rand() % 5) == 0) {
         isPA = true;
@@ -58,6 +66,12 @@ NullImplFRVTPad::detectEvasionPA(
         isPA = false;
         score = -1.0 * (rand()/(double)(RAND_MAX - 1));
     }
+
+    if (score > 0) {
+        decisionProperties.push_back(std::make_pair("PA detected", "exaggerated expression"));
+        decisionProperties.push_back(std::make_pair("PA detected", "eyes not visible"));
+    } else if (score > -0.09 && score < 0.09)
+        decisionProperties.push_back(std::make_pair("unable to make PA decision", "image resolution too low"));
 
     return ReturnStatus(ReturnCode::Success);
 }

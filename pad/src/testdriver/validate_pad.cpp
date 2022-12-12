@@ -12,6 +12,7 @@
 #include <iostream>
 #include <cstring>
 #include <iterator>
+#include <utility>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <csignal>
@@ -46,7 +47,7 @@ runPad(
     }
 
     /* header */
-    logStream << "id isPAD score returnCode" << endl;
+    logStream << "id isPAD score returnCode decisionProperties" << endl;
 
     string id, line;
     ReturnStatus ret;
@@ -77,20 +78,29 @@ runPad(
            
         bool isPAD{false};
         double score{-1.0};
+		std::vector< pair<std::string, std::string> > decisionProperties;
         if (action == Action::DetectImpersonationPA) 
-            ret = implPtr->detectImpersonationPA(media, isPAD, score);
+            ret = implPtr->detectImpersonationPA(media, isPAD, score, decisionProperties);
         else if (action == Action::DetectEvasionPA)
-            ret = implPtr->detectEvasionPA(media, isPAD, score);
+            ret = implPtr->detectEvasionPA(media, isPAD, score, decisionProperties);
         
         /* If function is not implemented, clean up and exit */
         if (ret.code == ReturnCode::NotImplemented) {
             break;
         }
 
+		std::string propString;
+		for (unsigned int i = 0; i < decisionProperties.size(); i++) {
+			propString += decisionProperties[i].first + "|" + decisionProperties[i].second;
+			if ((i+1) < decisionProperties.size())
+				propString += ";";
+		}
+
         logStream << id << " "
             << isPAD << " "
             << score << " "
-            << static_cast<std::underlying_type<ReturnCode>::type>(ret.code)
+            << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " \""
+			<< propString << "\""
             << std::endl;
     }
     inputStream.close();
@@ -124,7 +134,7 @@ main(
     auto exitStatus = SUCCESS;
 
     uint16_t currAPIMajorVersion{1},
-        currAPIMinorVersion{0},
+        currAPIMinorVersion{5},
         currStructsMajorVersion{2},
         currStructsMinorVersion{0};
 

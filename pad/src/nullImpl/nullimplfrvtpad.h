@@ -31,13 +31,15 @@ public:
     detectImpersonationPA(
         const FRVT_PAD::Media &suspectedPA,
         bool &isPA,
-        double &score) override;
+        double &score,
+        std::vector< std::pair<std::string, std::string> > &decisionProperties) override;
 
     FRVT::ReturnStatus
     detectEvasionPA(
         const FRVT_PAD::Media &suspectedPA,
         bool &isPA,
-        double &score) override;
+        double &score,
+        std::vector< std::pair<std::string, std::string> > &decisionProperties) override;
 
     static std::shared_ptr<FRVT_PAD::Interface>
     getImplementation();

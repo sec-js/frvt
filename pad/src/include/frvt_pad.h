@@ -13,6 +13,7 @@
 
 #include <cstdint>
 #include <string>
+#include <utility>
 
 #include <frvt_structs.h>
 
@@ -99,12 +100,20 @@ public:
      * A score on [-1, +1] representing how confident the algorithm is that the media
      * contains a PA.  -1 means certainty that the media does not contain a PA, and +1
      * represents certainty that the media contains a PA
+     * param[out] decisionProperties
+     * OPTIONAL.  A vector of key-value string pairs that developers can use to 
+     * provide additional information/descriptions on media properties and their 
+     * relationship to the PAD decision. There are no strictly-defined properties.  
+     * Some examples include <"presentation attack detected", "replay attack">, 
+     * <"presentation attack detected", "face mask">, 
+     * <"unable to make PAD determination", "no face detected">, etc.
      */
     virtual FRVT::ReturnStatus
     detectImpersonationPA(
         const Media &suspectedPA,
         bool &isPA,
-        double &score) = 0;
+        double &score,
+        std::vector< std::pair<std::string, std::string> > &decisionProperties) = 0;
 
     /**
      * @brief This function takes an input piece of media (image or sequential video frames) and outputs
@@ -122,12 +131,19 @@ public:
      * A score on [-1, +1] representing how confident the algorithm is that the media
      * contains a PA.  -1 means certainty that the media does not contain a PA, and +1
      * represents certainty that the media contains a PA
+     * param[out] decisionProperties
+     * OPTIONAL.  A vector of key-value string pairs that developers can use to
+     * provide additional information/descriptions on media properties and their
+     * relationship to the PAD decision. There are no strictly-defined properties.
+     * Some examples include <"presentation attack detected", "face mask">,
+     * <"presentation attack detected", "exaggerated expression">, etc.
      */
     virtual FRVT::ReturnStatus
     detectEvasionPA(
         const Media &suspectedPA,
         bool &isPA,
-        double &score) = 0;
+        double &score,
+        std::vector< std::pair<std::string, std::string> > &decisionProperties) = 0;
 
     /**
      * @brief
@@ -161,7 +177,7 @@ extern uint16_t API_MINOR_VERSION;
 /** API major version number. */
 uint16_t API_MAJOR_VERSION{1};
 /** API minor version number. */
-uint16_t API_MINOR_VERSION{0};
+uint16_t API_MINOR_VERSION{5};
 #endif /* NIST_EXTERN_API_VERSION */
 }
 
