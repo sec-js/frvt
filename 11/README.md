@@ -36,14 +36,14 @@ Note that this step is not required, because many of the packages listed are not
 3) Put a version.txt file into ./doc, which provides version control information for the submission.
 
 4) From the root validation directory, execute the validation script.
-````console
+````
 $ ./run_validation_11.sh
 ````
-    The validation script will
-    - Install required packages that don't already exist on your system.  You will need sudo rights and connection to the Internet for this.
-    - Compile and link your library against the validation test harness.
-    - Run the test harness that was built against your library on the validation dataset.
-    - Prepare your submission archive.
+The validation script will
+* Install required packages that don't already exist on your system.  You will need sudo rights and connection to the Internet for this.
+* Compile and link your library against the validation test harness.
+* Run the test harness that was built against your library on the validation dataset.
+* Prepare your submission archive.
 
 5) Upon successful validation, an archive will be generated named
    libfrvt_11_\<company\>_\<three-digit submission sequence\>.tar.gz
