@@ -37,7 +37,7 @@ Note that this step is not required, because many of the packages listed are not
 
 4) From the root validation directory, execute the validation script.
 ````
-$ ./run_validation_11.sh
+$ ./run_validate_11.sh
 ````
 The validation script will
 * Install required packages that don't already exist on your system.  You will need sudo rights and connection to the Internet for this.
