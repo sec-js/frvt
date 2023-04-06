@@ -49,7 +49,7 @@ public:
     initialize(const std::string &configDir) = 0;
 
     /**
-     * @brief This function supports template generation from one or more images of 
+     * @brief This function supports template generation from one or more face images of 
      * exactly one person.  It takes a vector of images and outputs a proprietary template
      * and associated eye coordinates.  The vectors to store the template and
      * eye coordinates will be initially empty, and it is up to the implementation
@@ -75,11 +75,44 @@ public:
      * number of entries.  Values in eyeCoordinates[i] shall correspond to faces[i].
      */
     virtual FRVT::ReturnStatus
-    createTemplate(
+    createFaceTemplate(
         const std::vector<FRVT::Image> &faces,
         FRVT::TemplateRole role,
         std::vector<uint8_t> &templ,
         std::vector<FRVT::EyePair> &eyeCoordinates) = 0;
+
+    /**
+     * @brief This function supports template generation from one or more iris images of
+     * exactly one person.  It takes a vector of images and outputs a proprietary template
+     * and associated iris locations.  The vectors to store the template and
+     * eye coordinates will be initially empty, and it is up to the implementation
+     * to populate them with the appropriate data.  In all cases, even when unable
+     * to extract features, the output shall be a template that may be passed to
+     * the match_templates function without error.  That is, this routine must
+     * internally encode "template creation failed" and the matcher must
+     * transparently handle this.
+     *
+     * @param[in] irises
+     * Implementations must alter their behavior according to the number of
+     * images contained in the structure and the TemplateRole type.
+     * @param[in] role
+     * Label describing the type/role of the template to be generated
+     * @param[out] templ
+     * The output template.  The format is entirely unregulated.  This will be
+     * an empty vector when passed into the function, and the implementation
+     * can resize and populate it with the appropriate data.
+     * @param[out] irisLocations 
+     * For each input image in the vector, the function shall return the
+     * estimated iris locations. This will be an empty vector when passed into the
+     * function, and the implementation shall populate it with the appropriate
+     * number of entries.  Values in irisLocations[i] shall correspond to irises[i].
+     */
+    virtual FRVT::ReturnStatus
+    createIrisTemplate(
+        const std::vector<FRVT::Image> &irises,
+        FRVT::TemplateRole role,
+        std::vector<uint8_t> &templ,
+        std::vector<FRVT::IrisAnnulus> &irisLocations) = 0;
 
     /**
      * @brief This function supports template generation of one or more people detected 
@@ -107,7 +140,7 @@ public:
      * number of entries.  Values in eyeCoordinates[i] shall correspond to templs[i].
      */
     virtual FRVT::ReturnStatus
-    createTemplate(
+    createFaceTemplate(
         const FRVT::Image &image,
         FRVT::TemplateRole role,
         std::vector<std::vector<uint8_t>> &templs,
@@ -115,9 +148,11 @@ public:
 
     /**
      * @brief This function compares two proprietary templates and outputs a
-     * similarity score, which need not satisfy the metric properties. When
-     * either or both of the input templates are the result of a failed
-     * template generation, the similarity score shall be -1 and the function
+     * measure of similarity or dissimilarity between the enrollment template and verification template.
+     * - For face recognition, a similarity score - higher is more similar
+     * - For iris recognition, a non-negative measure of dissimilarity (maybe a distance) - lower is more similar
+     * When either or both of the input templates are the result of a failed
+     * template generation, the score shall be -1 and the function
      * return value shall be VerifTemplateError.
      *
      * @param[in] verifTemplate
@@ -129,7 +164,7 @@ public:
      * The underlying data can be accessed via enrollTemplate.data().  The size,
      * in bytes, of the template could be retrieved as enrollTemplate.size().
      * @param[out] similarity
-     * A similarity score resulting from comparison of the templates,
+     * A score resulting from comparison of the templates,
      * on the range [0,DBL_MAX].
      *
      */
@@ -137,7 +172,7 @@ public:
     matchTemplates(
         const std::vector<uint8_t> &verifTemplate,
         const std::vector<uint8_t> &enrollTemplate,
-        double &similarity) = 0;
+        double &score) = 0;
 
     /**
      * @brief
@@ -167,9 +202,9 @@ extern uint16_t API_MAJOR_VERSION;
 extern uint16_t API_MINOR_VERSION;
 #else /* NIST_EXTERN_API_VERSION */
 /** API major version number. */
-uint16_t API_MAJOR_VERSION{5};
+uint16_t API_MAJOR_VERSION{6};
 /** API minor version number. */
-uint16_t API_MINOR_VERSION{1};
+uint16_t API_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_API_VERSION */
 }
 
