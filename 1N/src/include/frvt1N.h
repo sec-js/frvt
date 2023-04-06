@@ -18,6 +18,55 @@
 #include <frvt_structs.h>
 
 namespace FRVT_1N {
+
+/** Labels describing the composition of the 1:N gallery
+ *  (provided as input into gallery finalization function)
+ */
+enum class GalleryType {
+    /** Consolidated, subject-based */
+    Consolidated = 0,
+    /** Unconsolidated, event-based */
+    Unconsolidated = 1
+};
+
+/**
+ * @brief
+ * Data structure for result of an identification search
+ */
+typedef struct Candidate {
+    /** @brief If the candidate is valid, this should be set to true. If
+     * the candidate computation failed, this should be set to false.
+     * If value is set to false, score and templateId
+     * will be ignored entirely. */
+    bool isAssigned;
+
+    /** @brief The template ID from the enrollment database manifest */
+    std::string templateId;
+
+    /** @brief Measure of similarity or dissimilarity between the identification template
+     * and the enrolled candidate. 
+     * For face recognition, a similarity score - higher is more similar;
+     * For iris recognition, a non-negative measure of dissimilarity (maybe a distance) - lower is more similar;
+     * For multimodal face and iris, a similarity score - higher is more similar; 
+     */
+    double score;
+
+    Candidate() :
+        isAssigned{false},
+        templateId{""},
+        score{-1.0}
+        {}
+
+    Candidate(
+        bool isAssigned,
+        std::string templateId,
+        double score) :
+        isAssigned{isAssigned},
+        templateId{templateId},
+        score{score}
+        {}
+} Candidate;
+
 /**
  * @brief
  * The interface to FRVT 1:N implementation
@@ -54,8 +103,8 @@ public:
         FRVT::TemplateRole role) = 0;
 
     /**
-     * @brief This function supports template generation from one or more images of
-     * exactly one person.  It takes an input Multiface and outputs a template
+     * @brief This function supports template generation from one or more face images of
+     * exactly one person.  It takes as input a vector of images and outputs a template
      * and associated eye coordinates
      *
      * @details For enrollment templates: If the function
@@ -63,8 +112,8 @@ public:
      * the template will be enrolled into a gallery.  The NIST
      * calling application may store the resulting template,
      * concatenate many templates, and pass the result to the enrollment
-     * finalization function.  The resulting template may also
-     * be inserted immediately into a previously finalized gallery.
+     * finalization function.
+     *
      * When the implementation fails to produce a
      * template, it shall still return a blank template (which can be zero
      * bytes in length). The template will be included in the
@@ -79,7 +128,7 @@ public:
      * largest face in the image.
      *
      * @param[in] faces
-     * The input Multiface object.
+     * A vector of input face images 
      * @param[in] role
      * A value from the TemplateRole enumeration that indicates the intended
      * usage of the template to be generated.  In this case, either a 1:N
@@ -94,14 +143,14 @@ public:
      * for the input face images.
      */
     virtual FRVT::ReturnStatus
-    createTemplate(
-        const FRVT::Multiface &faces,
+    createFaceTemplate(
+        const std::vector<FRVT::Image> &faces,
         FRVT::TemplateRole role,
         std::vector<uint8_t> &templ,
         std::vector<FRVT::EyePair> &eyeCoordinates) = 0;
 
     /**
-     * @brief This function supports template generation of one or more people detected
+     * @brief This function supports face template generation of one or more people detected
      * from a single image.  It takes a single input image and outputs one or more proprietary
      * templates and associated eye coordinates based on the number of people detected.
      *
@@ -134,13 +183,99 @@ public:
      * estimated eye centers. This will be an empty vector when passed into the
      * function, and the implementation shall populate it with the appropriate
      * number of entries.  Values in eyeCoordinates[i] shall correspond to templs[i].
-     */    
+     */
     virtual FRVT::ReturnStatus
-    createTemplate(
+    createFaceTemplate(
         const FRVT::Image &image,
         FRVT::TemplateRole role,
         std::vector<std::vector<uint8_t>> &templ,
         std::vector<FRVT::EyePair> &eyeCoordinates) = 0;
+
+    /**
+     * @brief This function supports template generation from one or more iris images of
+     * exactly one person.  It takes as input a vector of images and outputs a template
+     * and optionally, the associated location of the iris in each image.
+     *
+     * @details For enrollment templates: If the function
+     * executes correctly (i.e. returns a successful exit status),
+     * the template will be enrolled into a gallery.  The NIST
+     * calling application may store the resulting template,
+     * concatenate many templates, and pass the result to the enrollment
+     * finalization function. 
+     *
+     * When the implementation fails to produce a
+     * template, it shall still return a blank template (which can be zero
+     * bytes in length). The template will be included in the
+     * enrollment database/manifest like all other enrollment templates, but
+     * is not expected to contain any feature information.
+     * <br>For identification templates: If the function returns a
+     * non-successful return status, the output template will be not be used
+     * in subsequent search operations.
+     *
+     * @param[in] irises
+     * A vector of input iris images
+     * @param[in] role
+     * A value from the TemplateRole enumeration that indicates the intended
+     * usage of the template to be generated.  In this case, either a 1:N
+     * enrollment template used for gallery enrollment or 1:N identification
+     * template used for search.
+     * @param[out] templ
+     * The output template.  The format is entirely unregulated.  This will be
+     * an empty vector when passed into the function, and the implementation can
+     * resize and populate it with the appropriate data.
+     * @param[out] irisLocations
+     * (Optional) The function may choose to return the estimated iris locations 
+     * for the input iris images.
+     */
+    virtual FRVT::ReturnStatus
+    createIrisTemplate(
+        const std::vector<FRVT::Image> &irises,
+        FRVT::TemplateRole role,
+        std::vector<uint8_t> &templ,
+        std::vector<FRVT::IrisAnnulus> &irisLocations) = 0;
+
+    /**
+     * @brief This function supports template generation from one or more face and/or iris images of
+     * exactly one person.  It takes as input a vector of images and outputs a template.
+     * NOTE: The implementation must handle both multimodal and unimodal samples for enrollment and probe 
+     * template generation where the input is 1) face and iris images or 2) face image(s) only or 3) iris image(s) only.
+     * For example, a gallery might be generated for which 80% of enrolled samples are face and iris, but 10% of 
+     * samples are face-only, and 10% are iris-only.  This reflects operational reality, but we anticipate 
+     * exercising mostly multimodal enrollments and searches.
+     *
+     * @details For enrollment templates: If the function
+     * executes correctly (i.e. returns a successful exit status),
+     * the template will be enrolled into a gallery.  The NIST
+     * calling application may store the resulting template,
+     * concatenate many templates, and pass the result to the enrollment
+     * finalization function.
+     *
+     * When the implementation fails to produce a
+     * template, it shall still return a blank template (which can be zero
+     * bytes in length). The template will be included in the
+     * enrollment database/manifest like all other enrollment templates, but
+     * is not expected to contain any feature information.
+     * <br>For identification templates: If the function returns a
+     * non-successful return status, the output template will be not be used
+     * in subsequent search operations.
+     *
+     * @param[in] facesIrises
+     * A vector of input face and/or iris images
+     * @param[in] role
+     * A value from the TemplateRole enumeration that indicates the intended
+     * usage of the template to be generated.  In this case, either a 1:N
+     * enrollment template used for gallery enrollment or 1:N identification
+     * template used for search.
+     * @param[out] templ
+     * The output template.  The format is entirely unregulated.  This will be
+     * an empty vector when passed into the function, and the implementation can
+     * resize and populate it with the appropriate data.
+     */
+    virtual FRVT::ReturnStatus
+    createFaceAndIrisTemplate(
+        const std::vector<FRVT::Image> &facesIrises,
+        FRVT::TemplateRole role,
+        std::vector<uint8_t> &templ) = 0;
 
      /**
       * @brief This function will be called after all enrollment templates have
@@ -195,7 +330,7 @@ public:
         const std::string &enrollmentDir,
         const std::string &edbName,
         const std::string &edbManifestName,
-        FRVT::GalleryType galleryType) = 0;
+        FRVT_1N::GalleryType galleryType) = 0;
 
     /**
      * @brief This function will be called once prior to one or more calls to
@@ -224,52 +359,32 @@ public:
      *
      * @details Each candidate shall be populated by the implementation
      * and added to candidateList.  Note that candidateList will be an empty
-     * vector when passed into this function.  The candidates shall appear in
-     * descending order of similarity score - i.e. most similar entries appear
-     * first.
+     * vector when passed into this function.  
+     * 
+     * For face recognition: the candidates shall appear in descending order
+     * of similarity score - i.e. most similar entries appear first.
+     * For iris recognition: the candidates shall appear in ascending order of
+     * dissimilarity - i.e. the least dissimilar entries appear first.
+     * For multimodal face and iris, the candidates shall appear in descending order
+     * of similarity score - i.e. most similar entries appear first. 
      *
      * @param[in] idTemplate
-     * A template from createTemplate().  If the value returned by that
-     * function was non-successful, the contents of idTemplate will not be
+     * A template from the implemented template creation function.  If the value 
+     * returned by that function was non-successful, the contents of idTemplate will not be
      * used, and this function will not be called.
+     *
      * @param[in] candidateListLength
      * The number of candidates the search should return.
      * @param[out] candidateList
      * Each candidate shall be populated by the implementation.  The candidates
      * shall appear in descending order of similarity score - i.e. most similar
      * entries appear first.
-     * @param[out] decision
-     * A best guess at whether there is a mate within the enrollment database.
-     * If there was a mate found, this value should be set to true, Otherwise, false.
-     * Many such decisions allow a single point to be plotted alongside a DET curve.
      */
     virtual FRVT::ReturnStatus
     identifyTemplate(
         const std::vector<uint8_t> &idTemplate,
         const uint32_t candidateListLength,
-        std::vector<FRVT::Candidate> &candidateList,
-        bool &decision) = 0;
-
-    /**
-     * @brief This function inserts a template with an associated id
-     * into an existing finalized gallery.
-     *
-     * @details Invocation of this function will always be preceded by
-     * a call to initializeIdentification(), which will provide the location
-     * of the gallery.  One or more calls to
-     * identifyTemplate may be made after calling this function.
-     *
-     * This function will be called from a single process/thread.
-     *
-     * @param[in] templ
-     * A template created via createTemplate(TemplateRole=Enrollment_1N)
-     * @param[in] id
-     * An identifier associated with the enrollment template
-     */
-    virtual FRVT::ReturnStatus
-    galleryInsertID(
-        const std::vector<uint8_t> &templ,
-        const std::string &id) = 0;
+        std::vector<FRVT_1N::Candidate> &candidateList) = 0;
 
     /**
      * @brief
@@ -299,7 +414,7 @@ extern uint16_t API_MAJOR_VERSION;
 extern uint16_t API_MINOR_VERSION;
 #else /* NIST_EXTERN_API_VERSION */
 /** API major version number. */
-uint16_t API_MAJOR_VERSION{2};
+uint16_t API_MAJOR_VERSION{3};
 /** API minor version number. */
 uint16_t API_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_API_VERSION */

@@ -20,6 +20,16 @@
 #include <frvt_structs.h>
 
 namespace FRVT_MORPH {
+/** Labels describing image media type */
+enum class ImageLabel {
+    /** Image type is unknown or unassigned */
+    Unknown = 0,
+    /** Non-scanned image */
+    NonScanned = 1,
+    /** Printed-and-scanned image */
+    Scanned = 2
+};
+
 /**
  * @brief
  * Struct representing metadata, including
@@ -126,7 +136,7 @@ public:
     virtual FRVT::ReturnStatus
     detectMorph(
         const FRVT::Image &suspectedMorph,
-        const FRVT::ImageLabel &label,
+        const FRVT_MORPH::ImageLabel &label,
         bool &isMorph,
         double &score) = 0;
 
@@ -165,7 +175,7 @@ public:
     virtual FRVT::ReturnStatus
     detectMorphDifferentially(
         const FRVT::Image &suspectedMorph,
-        const FRVT::ImageLabel &label,
+        const FRVT_MORPH::ImageLabel &label,
         const FRVT::Image &probeFace,
         bool &isMorph,
         double &score) = 0;
@@ -206,7 +216,7 @@ public:
     virtual FRVT::ReturnStatus
     detectMorphDifferentially(
         const FRVT::Image &suspectedMorph,
-        const FRVT::ImageLabel &label,
+        const FRVT_MORPH::ImageLabel &label,
         const FRVT::Image &probeFace,
         const FRVT_MORPH::SubjectMetadata &subjectMetadata,
         bool &isMorph,
@@ -266,7 +276,7 @@ extern uint16_t API_MAJOR_VERSION;
 extern uint16_t API_MINOR_VERSION;
 #else /* NIST_EXTERN_API_VERSION */
 /** API major version number. */
-uint16_t API_MAJOR_VERSION{3};
+uint16_t API_MAJOR_VERSION{4};
 /** API minor version number. */
 uint16_t API_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_API_VERSION */

@@ -26,24 +26,50 @@ namespace FRVT {
  */
 typedef struct Image {
     /** Labels describing the type of image */
-    enum class Label {
-        /** Unknown or unassigned. */
-        Unknown = 0,
-        /** Frontal, ISO/IEC 19794-5:2005 compliant. */
-        Iso,
-        /** From law enforcement booking processes. Nominally frontal. */
-        Mugshot,
-        /** The image might appear in a news source or magazine.
-         * The images are typically well exposed and focused but
-         * exhibit pose and illumination variations. */
-        Photojournalism,
-        /** The image is taken from a child exploitation database.
-         * This imagery has highly unconstrained pose and illumination */
-        Exploitation,
-        /** Unconstrained image, taken by an amateur photographer, exhibiting
-         * wide variations in pose, illumination, and resolution.
-         */
-        Wild
+    enum class ImageDescription {
+        /** Face image with unknown or unassigned collection conditions */
+        FaceUnknown = 0,
+        /** Face image, Frontal closely ISO/IEC 19794-5:2005 compliant. */
+        FaceIso = 1,
+        /** Face image from law enforcement booking processes, nominally frontal. */
+        FaceMugshot = 2,
+        /** Face image that might appear in a news source or magazine. The images are typically
+         * typically well exposed and focused but exhibit pose and illumination variations. */
+        FacePhotojournalism = 3,
+        /** Unconstrained face, taken by amateur photographer, widely varying pose, illumination, resolution. */
+        FaceWild = 4,
+        /** Iris image with unknown or unassigned collection conditions */
+        IrisUnknown = 5,
+        /** Image of one iris from iris camera that illuminates the iris in NIR */
+        IrisNIR = 6,
+        /** Image of one iris from non-iris camera, with visible ambient illumination */
+        IrisWild = 7
+    };
+
+    enum class Illuminant {
+        /** Not specified */
+        Unspecified = 0,
+        /** Conventional visible light */
+        Visible = 1,
+        /** Near infrared, as used in conventional iris cameras and some face cameras e.g. outdoors */
+        NIR = 2,
+        /** Short wave infrared */
+        SWIR = 3,
+        /** Medium wave infrared */
+        MWIR = 4,
+        /** Long wave infrared - emissive */
+        LWIR = 5
+    };
+
+    /** Labels describing whether it's the left or right iris */ 
+    enum class IrisLR
+    {
+        /** Not specified */
+        Unspecified = 0,
+        /** Right iris */
+        RightIris = 1,
+        /** Left iris */
+        LeftIris = 2
     };
 
     /** Number of pixels horizontally */
@@ -57,14 +83,20 @@ typedef struct Image {
      * If image_depth == 24 this points to  3WH bytes  RGBRGBRGB...
      * If image_depth ==  8 this points to  WH bytes  IIIIIII */
     std::shared_ptr<uint8_t> data;
-    /** @brief Single description of the image.  */
-    Label description;
+    /** Single description of the image.  */     
+    ImageDescription description;
+    /** Source of light used to acquire the image */
+    Illuminant illuminant;
+    /** The iris label (left, right, or unspecified).  Not applicable for face images. */
+    IrisLR irisLR;
 
     Image() :
         width{0},
         height{0},
         depth{24},
-        description{Label::Unknown}
+        description{ImageDescription::FaceUnknown},
+        illuminant{Illuminant::Unspecified},
+        irisLR{IrisLR::Unspecified}
         {}
 
     Image(
@@ -72,13 +104,17 @@ typedef struct Image {
         uint16_t height,
         uint8_t depth,
         std::shared_ptr<uint8_t> &data,
-        Label description
+        ImageDescription description,
+        Illuminant illuminant,
+        IrisLR irisLR = IrisLR::Unspecified
         ) :
         width{width},
         height{height},
         depth{depth},
         data{data},
-        description{description}
+        description{description},
+        illuminant{illuminant},
+        irisLR{irisLR}
         {}
 
     /** @brief This function returns the size of the image data. */
@@ -86,14 +122,39 @@ typedef struct Image {
     size() const { return (width * height * (depth / 8)); }
 } Image;
 
-/**
- * @brief
- * Data structure representing a set images of a single person
- *
- * @details
- * The set of faces passed to the template extraction process.
+/** @brief 
+ * Structure specifying the approximate horizontal center of the limbus 
+ * in pixels of the iris in an image. Provides an estimate of the limbus 
+ * center (limbusCenterX, limbusCenterY) and pupil (pupilRadius) and 
+ * limbus (limbusRadius) radii. When provided, the estimates should be 
+ * accurate to within a few pixels.
  */
-using Multiface = std::vector<Image>;
+typedef struct IrisAnnulus
+{
+    uint16_t limbusCenterX;
+    uint16_t limbusCenterY;
+    uint16_t pupilRadius;
+    uint16_t limbusRadius;
+
+    IrisAnnulus() :
+        limbusCenterX{0},
+        limbusCenterY{0},
+        pupilRadius{0},
+        limbusRadius{0}
+        {}
+       
+    IrisAnnulus(
+        uint16_t limbusCenterX,
+        uint16_t limbusCenterY,
+        uint16_t pupilRadius,
+        uint16_t limbusRadius
+        ) :
+        limbusCenterX{limbusCenterX},
+        limbusCenterY{limbusCenterY},
+        pupilRadius{pupilRadius},
+        limbusRadius{limbusRadius}
+        {} 
+} IrisAnnulus;
 
 /** Labels describing the type/role of the template
  * to be generated (provided as input to template generation)
@@ -102,11 +163,11 @@ enum class TemplateRole {
     /** 1:1 enrollment template */
     Enrollment_11 = 0,
     /** 1:1 verification template */
-    Verification_11,
+    Verification_11 = 1,
     /** 1:N enrollment template */
-    Enrollment_1N,
+    Enrollment_1N = 2,
     /** 1:N identification template */
-    Search_1N
+    Search_1N = 3
 };
 
 /**
@@ -117,43 +178,39 @@ enum class ReturnCode {
     /** Success */
     Success = 0,
     /** Catch-all error */
-    UnknownError,
+    UnknownError = 1,
     /** Error reading configuration files */
-    ConfigError,
+    ConfigError = 2,
     /** Elective refusal to process the input */
-    RefuseInput,
+    RefuseInput = 3,
     /** Involuntary failure to process the image */
-    ExtractError,
+    ExtractError = 4,
     /** Cannot parse the input data */
-    ParseError,
+    ParseError = 5,
     /** Elective refusal to produce a template */
-    TemplateCreationError,
-    /** Either or both of the input templates were result of failed
-     * feature extraction */
-    VerifTemplateError,
+    TemplateCreationError = 6,
+    /** Either or both of the input templates were result of failed feature extraction */
+    VerifTemplateError = 7,
     /** Unable to detect a face in the image */
-    FaceDetectionError,
+    FaceDetectionError = 8,
     /** The implementation cannot support the number of input images */
-    NumDataError,
+    NumDataError = 9,
     /** Template file is an incorrect format or defective */
-    TemplateFormatError,
-    /**
-     * An operation on the enrollment directory
-     * failed (e.g. permission, space)
-     */
-    EnrollDirError,
+    TemplateFormatError = 10,
+    /** An operation on the enrollment directory failed (e.g. permission, space) */
+    EnrollDirError = 11,
     /** Cannot locate the input data - the input files or names seem incorrect */
-    InputLocationError,
+    InputLocationError = 12,
     /** Memory allocation failed (e.g. out of memory) */
-    MemoryError,
+    MemoryError = 13,
     /** Error occurred during the 1:1 match operation */
-    MatchError,
+    MatchError = 14,
     /** Failure to generate a quality score on the input image */
-    QualityAssessmentError,
+    QualityAssessmentError = 15,
     /** Function is not implemented */
-    NotImplemented,
+    NotImplemented = 16,
     /** Vendor-defined failure */
-    VendorError
+    VendorError = 17
 };
 
 /** Output stream operator for a ReturnCode object. */
@@ -196,7 +253,7 @@ operator<<(
     case ReturnCode::MatchError:
         return (s << "Error occurred during the 1:1 match operation");
     case ReturnCode::QualityAssessmentError:
-    return (s << "Failure to generate a quality score on the input image");
+        return (s << "Failure to generate a quality score on the input image");
     case ReturnCode::NotImplemented:
         return (s << "Function is not implemented");
     case ReturnCode::VendorError:
@@ -293,212 +350,6 @@ typedef struct EyePair
         {}
 } EyePair;
 
-/** Labels describing the composition of the 1:N gallery
- *  (provided as input into gallery finalization function)
- */
-enum class GalleryType {
-    /** Consolidated, subject-based */
-    Consolidated = 0,
-    /** Unconsolidated, event-based */
-    Unconsolidated
-};
-
-/**
- * @brief
- * Data structure for result of an identification search
- */
-typedef struct Candidate {
-    /** @brief If the candidate is valid, this should be set to true. If
-     * the candidate computation failed, this should be set to false.
-     * If value is set to false, similarityScore and templateId
-     * will be ignored entirely. */
-    bool isAssigned;
-
-    /** @brief The template ID from the enrollment database manifest */
-    std::string templateId;
-
-    /** @brief Measure of similarity between the identification template
-     * and the enrolled candidate.  Higher scores mean more likelihood that
-     * the samples are of the same person.  An algorithm is free to assign
-     * any value to a candidate.
-     * The distribution of values will have an impact on the appearance of a
-     * plot of false-negative and false-positive identification rates. */
-    double similarityScore;
-
-    Candidate() :
-        isAssigned{false},
-        templateId{""},
-        similarityScore{-1.0}
-        {}
-
-    Candidate(
-        bool isAssigned,
-        std::string templateId,
-        double similarityScore) :
-        isAssigned{isAssigned},
-        templateId{templateId},
-        similarityScore{similarityScore}
-        {}
-} Candidate;
-
-/** Labels describing image media type */
-enum class ImageLabel {
-    /** Image type is unknown or unassigned */
-    Unknown = 0,
-    /** Non-scanned image */
-    NonScanned,
-    /** Printed-and-scanned image */
-    Scanned
-};
-
-/** Quality measure labels 
- */
-enum class QualityMeasure {
-    Begin = 0,
-    TotalFacesPresent = Begin,
-    SubjectPoseRoll,
-    SubjectPosePitch,
-    SubjectPoseYaw,
-    EyeGlassesPresent,
-    SunGlassesPresent,
-    Underexposure,
-    Overexposure,
-    BackgroundUniformity,
-    MouthOpen,
-    EyesOpen,
-    FaceOcclusion,
-    Resolution,
-    InterEyeDistance,
-    MotionBlur,
-    CompressionArtifacts,
-    PixelsFromHeadToLeftEdge,
-    PixelsFromHeadToRightEdge,
-    PixelsFromChinToBottom,
-    PixelsFromHeadToTop,
-    UnifiedQualityScore,
-    End
-};
-
-/** To support iterating over QualityMeasure enum values */
-inline QualityMeasure& 
-operator++(QualityMeasure& qe) {
-   if (qe == QualityMeasure::End) 
-        throw std::out_of_range("QualityMeasure& operator++(QualityMeasure&)");
-    qe = QualityMeasure(static_cast<std::underlying_type<QualityMeasure>::type>(qe) + 1);
-    return qe;
-}
-
-/** Output stream operator for QualityMeasure enum. */
-inline std::ostream&
-operator<<(
-    std::ostream &s,
-    const QualityMeasure &qe)
-{
-    switch (qe) {
-    case QualityMeasure::TotalFacesPresent:
-        return (s << "TotalFacesPresent");
-    case QualityMeasure::SubjectPoseRoll:
-        return (s << "SubjectPoseRoll");
-    case QualityMeasure::SubjectPosePitch:
-        return (s << "SubjectPosePitch");
-    case QualityMeasure::SubjectPoseYaw:
-        return (s << "SubjectPoseYaw");
-    case QualityMeasure::EyeGlassesPresent:
-        return (s << "EyeGlassesPresent");
-    case QualityMeasure::SunGlassesPresent:
-        return (s << "SunGlassesPresent");
-    case QualityMeasure::Underexposure:
-        return (s << "Underexposure");
-    case QualityMeasure::Overexposure:
-        return (s << "Overexposure");
-    case QualityMeasure::BackgroundUniformity:
-        return (s << "BackgroundUniformity");
-    case QualityMeasure::MouthOpen:
-        return (s << "MouthOpen");
-    case QualityMeasure::EyesOpen:
-        return (s << "EyesOpen");
-    case QualityMeasure::FaceOcclusion:
-        return (s << "FaceOcclusion");
-    case QualityMeasure::Resolution:
-        return (s << "Resolution");
-    case QualityMeasure::InterEyeDistance:
-        return (s << "InterEyeDistance");
-    case QualityMeasure::MotionBlur:
-        return (s << "MotionBlur");
-    case QualityMeasure::CompressionArtifacts:
-        return (s << "CompressionArtifacts");
-    case QualityMeasure::PixelsFromHeadToLeftEdge:
-        return (s << "PixelsFromHeadToLeftEdge");
-    case QualityMeasure::PixelsFromHeadToRightEdge:
-        return (s << "PixelsFromHeadToRightEdge");
-    case QualityMeasure::PixelsFromChinToBottom:
-        return (s << "PixelsFromChinToBottom");
-    case QualityMeasure::PixelsFromHeadToTop:
-        return (s << "PixelsFromHeadToTop");
-    case QualityMeasure::UnifiedQualityScore:
-        return (s << "UnifiedQualityScore");
-    default:
-        return (s << "undefined QualityMeasure");
-    }
-}
-
-/**
- * @brief
- * Data structure that stores key-value pairs, with each
- * entry representing a quality element and its value 
- */
-using QualityAssessments = std::map<QualityMeasure, double>;
-
-typedef struct BoundingBox
-{
-    /** @brief leftmost point on head, typically subject's right ear
-     *  value must be on [0, imageWidth-1] */
-    int16_t xleft; 
-    /** @brief high point of head, typically top of hair;
-     *  value must be on [0, imageHeight-1] */           
-    int16_t ytop;
-    /** @brief bounding box width */ 
-    int16_t width;
-    /** @brief bounding box height */
-    int16_t height;
-
-    BoundingBox() :
-        xleft{-1},
-        ytop{-1},
-        width{-1},
-        height{-1}
-        {}
-
-    BoundingBox(
-        int16_t xleft,
-        int16_t ytop,
-        int16_t width,
-        int16_t height) :
-        xleft{xleft},
-        ytop{ytop},
-        width{width},
-        height{height}
-        {}
-} BoundingBox;
-
-typedef struct ImageQualityAssessment
-{
-    BoundingBox boundingBox;
-    QualityAssessments qAssessments; 
-    
-    ImageQualityAssessment() :
-        boundingBox{},
-        qAssessments{}
-        {}
-
-    ImageQualityAssessment(
-        const BoundingBox &boundingBox,
-        const QualityAssessments &qAssessments) :
-        boundingBox{boundingBox},
-        qAssessments{qAssessments}
-        {}
-} ImageQualityAssessment;
-
 /*
 * Versioning
 *
@@ -512,7 +363,7 @@ extern uint16_t FRVT_STRUCTS_MAJOR_VERSION;
 extern uint16_t FRVT_STRUCTS_MINOR_VERSION;
 #else /* NIST_EXTERN_FRVT_STRUCTS_VERSION */
 /** major version number. */
-uint16_t FRVT_STRUCTS_MAJOR_VERSION{2};
+uint16_t FRVT_STRUCTS_MAJOR_VERSION{3};
 /** minor version number. */
 uint16_t FRVT_STRUCTS_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_FRVT_STRUCTS_VERSION */
