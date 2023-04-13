@@ -131,9 +131,16 @@ typedef struct Image {
  */
 typedef struct IrisAnnulus
 {
+    /** @brief X-coordinate of the limbus center. */
     uint16_t limbusCenterX;
+
+    /** @brief Y-coordinate of the limbus center. */
     uint16_t limbusCenterY;
+
+    /** @brief X-coordinate of the pupil center. */
     uint16_t pupilRadius;
+
+    /** @brief Y-coordinate of the pupil center. */
     uint16_t limbusRadius;
 
     IrisAnnulus() :
