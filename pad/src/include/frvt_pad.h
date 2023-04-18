@@ -74,7 +74,7 @@ public:
      */
     virtual FRVT::ReturnStatus
     detectImpersonationPA(
-        const Media &suspectedPA,
+        const FRVT::Media &suspectedPA,
         bool &isPA,
         double &score,
         std::vector< std::pair<std::string, std::string> > &decisionProperties) = 0;
@@ -104,7 +104,7 @@ public:
      */
     virtual FRVT::ReturnStatus
     detectEvasionPA(
-        const Media &suspectedPA,
+        const FRVT::Media &suspectedPA,
         bool &isPA,
         double &score,
         std::vector< std::pair<std::string, std::string> > &decisionProperties) = 0;
