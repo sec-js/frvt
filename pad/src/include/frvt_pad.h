@@ -21,42 +21,6 @@ namespace FRVT_PAD {
 
 /**
  * @brief
- * Struct representing a piece of media
- */
-typedef struct Media {
-    /** Labels describing the type of media */
-    enum class Label {
-        /** Still photos of an individual */
-        Image = 0,
-        /** Sequential video frames of an individual */
-        Video = 1
-    };
-
-    /** Type of media */
-    Label type;
-    /** Vector of still image(s) or video frames */
-    std::vector<FRVT::Image> data;
-    /** For video data, the frame rate in frames per second */
-    uint8_t fps;
-
-    Media() :
-        type{Media::Label::Image},
-        fps{0}
-        {}
-
-    Media(
-        const Media::Label type,
-        const std::vector<FRVT::Image> &data,
-        const uint8_t fps
-        ) :
-        type{type},
-        data{data},
-        fps{fps}
-        {}
-} Media;
-
-/**
- * @brief
  * The interface to FRVT PAD implementation
  *
  * @details
