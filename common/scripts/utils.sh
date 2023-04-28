@@ -6,8 +6,7 @@ failure=1
 bold=$(tput bold)
 normal=$(tput sgr0)
 
-#reqOS="Ubuntu 20.04.3 LTS"
-reqOS="Ubuntu 20.04.6 LTS"
+reqOS="Ubuntu 20.04.3 LTS"
 
 # Function to check version of OS
 check_os() {
