@@ -42,7 +42,7 @@ The validation script will
 * Prepare your submission archive.
 
 5) Upon successful validation, an archive will be generated named
-   libfrvt_11_\<company\>_\<three-digit submission sequence\>.tar.gz
+   libfrvt_11_\<company\>_\<three-digit submission sequence\>.v\<validation_package_version\>.tar.gz
 
    This archive must be properly encrypted and signed before transmission to NIST.  This must be done according to these instructions - https://www.nist.gov/system/files/nist_encryption.pdf using the LATEST FRVT Ongoing public key linked from -
    https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwaredata-transmission-nist.
@@ -50,7 +50,7 @@ The validation script will
    For example:
 ````
 $ gpg --default-key <ParticipantEmail> --output <filename>.gpg --encrypt \\
---recipient frvt@nist.gov --sign libfrvt_11_<company>_<three-digit submission sequence>.tar.gz
+--recipient frvt@nist.gov --sign libfrvt_11_<company>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
 ````
 
 6) Send the encrypted file and your public key to NIST.  You can

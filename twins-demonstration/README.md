@@ -38,17 +38,17 @@ To successfully complete the validation process, and to prepare your submission 
 3) Put a version.txt file into ./doc, which provides version control information for the submission.
 
 4) From the root validation directory, execute the validation script.
-````console
+````
 $ ./run_validation_twins.sh
 ````
-    The validation script will
-    - Install required packages that don't already exist on your system.  You will need sudo rights and connection to the Internet for this.
-    - Compile and link your library against the validation test harness.
-    - Run the test harness that was built against your library on the validation dataset.
-    - Prepare your submission archive.
+The validation script will
+* Install required packages that don't already exist on your system.  You will need sudo rights and connection to the Internet for this.
+* Compile and link your library against the validation test harness.
+* Run the test harness that was built against your library on the validation dataset.
+* Prepare your submission archive.
 
 5) Upon successful validation, an archive will be generated named
-   libfrvt_11_twins_\<company\>_\<three-digit submission sequence\>.tar.gz
+   libfrvt_11_twins_\<company\>_\<three-digit submission sequence\>.v\<validation_package_version\>.tar.gz
 
    This archive must be properly encrypted and signed before transmission to NIST.  This must be done according to these instructions - https://www.nist.gov/system/files/nist_encryption.pdf using the LATEST FRVT Ongoing public key linked from -
    https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwaredata-transmission-nist.
@@ -56,7 +56,7 @@ $ ./run_validation_twins.sh
    For example:
 ````
 $ gpg --default-key <ParticipantEmail> --output <filename>.gpg --encrypt \\
---recipient frvt@nist.gov --sign libfrvt_11_twins_<company>_<three-digit submission sequence>.tar.gz
+--recipient frvt@nist.gov --sign libfrvt_11_twins_<company>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
 ````
 
 6) Send the encrypted file and your public key to NIST.  You can
