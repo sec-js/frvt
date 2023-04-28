@@ -47,7 +47,8 @@ The validation script will
    For example:
 ````
 $ gpg --default-key <ParticipantEmail> --output <filename>.gpg --encrypt \\
---recipient frvt@nist.gov --sign libfrvt_morph_<company>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
+--recipient frvt@nist.gov --sign \\
+libfrvt_morph_<company>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
 ````
 6) Send the encrypted file and your public key to NIST.  You can
 - Email the files to frvt@nist.gov if your package is less than 20MB OR
