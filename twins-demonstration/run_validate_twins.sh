@@ -100,7 +100,7 @@ https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwa
 For example:
       gpg --default-key <ParticipantEmail> --output <filename>.gpg \\\\
       --encrypt --recipient frvt@nist.gov --sign \\\\
-      libfrvt_11_<organization>_<three-digit submission sequence>.tar.gz
+      libfrvt_11_<organization>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
 
 Send the encrypted file and your public key to NIST.  You can
       a) Email the files to frvt@nist.gov if your package is less than 20MB OR
