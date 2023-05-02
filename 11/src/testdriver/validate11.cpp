@@ -93,11 +93,11 @@ createTemplate(
 
         vector<uint8_t> templ;
         vector<EyePair> eyes;
-        auto ret = implPtr->createTemplate(faces, role, templ, eyes);
+        auto ret = implPtr->createFaceTemplate(faces, role, templ, eyes);
         
         /* Check that function is implemented */
         if (ret.code == ReturnCode::NotImplemented) {
-            cerr << "[ERROR] The createTemplate(faces, role, templ, eyes) function returned ReturnCode::NotImplemented.  This function must be implemented!" << std::endl;
+            cerr << "[ERROR] The createFaceTemplate(faces, role, templ, eyes) function returned ReturnCode::NotImplemented.  This function must be implemented!" << std::endl;
             raise(SIGTERM);
         }
 
@@ -184,11 +184,11 @@ createMultiTemplates(
 
         vector<vector<uint8_t>> templs;
         vector<EyePair> eyes;
-        auto ret = implPtr->createTemplate(image, role, templs, eyes);
+        auto ret = implPtr->createFaceTemplate(image, role, templs, eyes);
 
         /* Check that function is implemented */
         if (ret.code == ReturnCode::NotImplemented) {
-            cerr << "[ERROR] The createTemplate(image, role, templs, eyes) function returned ReturnCode::NotImplemented.  This function must be implemented!" << std::endl;
+            cerr << "[ERROR] The createFaceTemplate(image, role, templs, eyes) function returned ReturnCode::NotImplemented.  This function must be implemented!" << std::endl;
             raise(SIGTERM);
         }
 
