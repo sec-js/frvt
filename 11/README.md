@@ -1,4 +1,6 @@
 # FRVT 1:1 validation package
+<strong>NOTE: We are currently NOT accepting 1:1 iris recognition submissions.</strong>
+
 The purpose of this validation package is to
 1) validate that your software adheres to the [FRVT 1:1 API](https://pages.nist.gov/frvt/api/FRVT_ongoing_11_api.pdf),
 2) ensure that NIST's execution of your library submission produces the expected output, and
