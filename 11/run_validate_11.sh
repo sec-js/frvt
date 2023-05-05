@@ -90,7 +90,7 @@ tar -zcf $libstring.v${version}.tar.gz ./config ./lib ./validation ./doc
 echo "[SUCCESS]"
 echo "
 #################################################################################################################
-A submission package has been generated named $libstring.tar.gz.  
+A submission package has been generated named $libstring.tar.gz.  DO NOT RENAME THIS FILE. 
 
 This archive must be properly encrypted and signed before transmission to NIST.
 This must be done according to these instructions - https://www.nist.gov/sites/default/files/nist_encryption.pdf
