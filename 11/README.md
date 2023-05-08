@@ -46,7 +46,7 @@ The validation script will
 5) Upon successful validation, an archive will be generated named
    libfrvt_11_\<company\>_\<three-digit submission sequence\>.v\<validation_package_version\>.tar.gz
 
-   This archive must be properly encrypted and signed before transmission to NIST.  This must be done according to these instructions - https://www.nist.gov/system/files/nist_encryption.pdf using the LATEST FRVT Ongoing public key linked from -
+   This archive must be properly encrypted and signed before transmission to NIST.  This must be done using the LATEST FRVT Ongoing public key linked from -
    https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwaredata-transmission-nist.
 
    For example:
