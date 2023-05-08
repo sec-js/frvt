@@ -30,12 +30,12 @@ NullImplFRVT11_TWINS::initialize(const std::string &configDir)
 
 ReturnStatus
 NullImplFRVT11_TWINS::createTemplate(
-        const Multiface &faces,
+        const std::vector<Image> &faces,
         TemplateRole role,
         std::vector<uint8_t> &templ,
         std::vector<EyePair> &eyeCoordinates)
 {
-    /* Note: Multiface - createTemplate() will not be in the Twins Demonstraion Track  */
+    /* Note: createTemplate() will not be in the Twins Demonstraion Track  */
     return ReturnStatus(ReturnCode::Success);
 }
 

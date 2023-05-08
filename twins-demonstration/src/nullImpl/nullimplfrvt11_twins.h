@@ -28,7 +28,7 @@ public:
 
     FRVT::ReturnStatus
     createTemplate(
-            const FRVT::Multiface &faces,
+            const std::vector<Image> &faces,
             FRVT::TemplateRole role,
             std::vector<uint8_t> &templ,
             std::vector<FRVT::EyePair> &eyeCoordinates) override;
