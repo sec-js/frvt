@@ -173,10 +173,10 @@ typedef struct IrisAnnulus
     /** @brief Y-coordinate of the limbus center. */
     uint16_t limbusCenterY;
 
-    /** @brief X-coordinate of the pupil center. */
+    /** @brief Estimate of pupil radius in pixels. */
     uint16_t pupilRadius;
 
-    /** @brief Y-coordinate of the pupil center. */
+    /** @brief Estimate of limbus radius in pixels. */
     uint16_t limbusRadius;
 
     IrisAnnulus() :
