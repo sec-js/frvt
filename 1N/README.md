@@ -12,7 +12,7 @@ The code provided here is meant only for validation purposes and does not reflec
 Please confirm that your software can handle very very large enrollment database sizes.  Specifically, please ensure that your software (especially during finalization and search) can handle processing an EDB (enrollment database) that exceeds 2<sup>32</sup> bytes in size.  In other words, use 64-bit types when you need them.
 
 # Validation Dataset
-The ../common/images directory will contain all of the images necessary for validation.
+The ../common/images directory will contain all of the images necessary for validation. Full documentation on the validation images is available at [https://pages.nist.gov/frvt/api/NIST.TN.2058.pdf](https://pages.nist.gov/frvt/api/NIST.TN.2058.pdf).
 
 NOTE: The validation images are used for the sole purpose of validation and stress-testing your software.  The images are not necessarily representative of actual test data that will be used to evaluate the implementations.  Please do not contact NIST about actual testing with such validation-type imagery.
 
