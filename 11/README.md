@@ -56,10 +56,8 @@ $ gpg --default-key <ParticipantEmail> --output <filename>.gpg --encrypt \\
 libfrvt_11_<company>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
 ````
 
-6) Send the encrypted file and your public key to NIST.  You can
-- Email the files to frvt@nist.gov if your package is less than 20MB OR
-- Provide a download link from a generic http webserver (NIST will NOT register or establish any kind of membership on the provided website).  The preferred mechanism is Google Drive.  We do NOT accept Dropbox links. OR
-- Mail a CD/DVD to NIST at the address provided in the participation agreement
+6) Submit the archive to NIST following the instructions at
+   [http://pages.nist.gov/frvt/html/frvt_submission_form.html](http://pages.nist.gov/frvt/html/frvt_submission_form.html).
 
 7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRVT mailing list to receive emails when new reports are published or announcements are made.
 
