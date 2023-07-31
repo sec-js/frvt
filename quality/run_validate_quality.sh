@@ -80,7 +80,8 @@ log_os
 # append frvt_structs.h version to submission filename
 version=$(get_frvt_header_version)
 
-tar -zcf $libstring.v${version}.tar.gz ./config ./lib ./validation ./doc
+libstring="$libstring.v${version}"
+tar -zcf $libstring.tar.gz ./doc ./config ./lib ./validation
 echo "[SUCCESS]"
 echo "
 #################################################################################################################
