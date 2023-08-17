@@ -13,3 +13,7 @@ The [pad](https://github.com/usnistgov/frvt/tree/master/pad) directory is for th
 The [quality](https://github.com/usnistgov/frvt/tree/master/quality) directory is for the [FRVT automated quality assessment evaluation](https://pages.nist.gov/frvt/api/FRVT_ongoing_quality_api.pdf).
 
 The [morph](https://github.com/usnistgov/frvt/tree/master/morph) directory is for the [automated facial morph detection evaluation](https://pages.nist.gov/frvt/api/FRVT_ongoing_morph_api.pdf).
+
+The [age-estimation](https://github.com/usnistgov/frvt/tree/master/age-estimation) directory is for the [Age-estimation evaluation](https://pages.nist.gov/frvt/api/FATE_AgeEstimation_API_v1.pdf).
+
+The [twins-demonstration](https://github.com/usnistgov/frvt/tree/master/twins-demonstration) directory is for the [Demonstration Track: Distinguishing Twins](https://pages.nist.gov/frvt/api/FRVT_Twins_Demo_concept_v1.pdf)
