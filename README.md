@@ -16,4 +16,4 @@ The [morph](https://github.com/usnistgov/frvt/tree/master/morph) directory is fo
 
 The [age-estimation](https://github.com/usnistgov/frvt/tree/master/age-estimation) directory is for the [Age-estimation evaluation](https://pages.nist.gov/frvt/api/FATE_AgeEstimation_API_v1.pdf).
 
-The [twins-demonstration](https://github.com/usnistgov/frvt/tree/master/twins-demonstration) directory is for the [Demonstration Track: Distinguishing Twins](https://pages.nist.gov/frvt/api/FRVT_Twins_Demo_concept_v1.pdf)
+The [twins-demonstration](https://github.com/usnistgov/frvt/tree/master/twins-demonstration) directory is for the [Demonstration Track: Distinguishing Twins](https://pages.nist.gov/frvt/api/FRVT_Twins_Demo_concept_v1.pdf).
