@@ -119,8 +119,8 @@ enum class Action {
     /* PAD */
     DetectImpersonationPA,
     DetectEvasionPA,
-    /*AGE ESTIMATION */						<
-    EstimateAge,						<
+    /*AGE ESTIMATION */	
+    EstimateAge,					
     VerifyAge
 };
 
