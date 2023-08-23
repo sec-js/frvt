@@ -118,7 +118,10 @@ enum class Action {
 	VectorQ,
     /* PAD */
     DetectImpersonationPA,
-    DetectEvasionPA
+    DetectEvasionPA,
+    /*AGE ESTIMATION */						<
+    EstimateAge,						<
+    VerifyAge
 };
 
 /**
