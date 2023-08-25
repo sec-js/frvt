@@ -16,7 +16,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <csignal>
-
+#include <iomanip>
+#include <sstream>
 
 #include "frvt_ae.h"
 #include "util.h"
@@ -100,8 +101,10 @@ runEstimateAge(
             raise(SIGTERM);
         }
 
+	std::stringstream ageEstimate_ss;
+        ageEstimate_ss << std::fixed << std::setprecision(2) << estimateAge;
         logStream << id << " "
-            << estimateAge << " "
+            << ageEstimate_ss.str() << " "
             << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " " 
             << std::endl;
     }
@@ -162,7 +165,7 @@ runVerifyAge(
 
         logStream << id << " "
             << ageThreshold << " "
-	    << isAboveThreshold << " "
+	    << (isAboveThreshold ? "TRUE" : "FALSE") << " "
             << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " " 
             << std::endl;
     }
