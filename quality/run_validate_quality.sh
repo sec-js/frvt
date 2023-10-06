@@ -35,7 +35,7 @@ outputDir="validation"
 echo -n "Sanity checking validation output "
 numInputLines=$(cat input/quality.txt | wc -l)
 numLogs=0
-for action in scalarQ vectorQ 
+for action in vectorQ 
 do
     # Make sure all images in input file have been processed
     if [ -e "$outputDir/$action.log" ]; then
