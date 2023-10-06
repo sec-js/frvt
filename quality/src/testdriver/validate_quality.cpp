@@ -46,9 +46,7 @@ runQuality(
     }
 
     /* header */
-    if (action == Action::ScalarQ)
-        logStream << "id image returnCode quality" << endl;
-    else if (action == Action::VectorQ) {
+    if (action == Action::VectorQ) {
         logStream << "id image returnCode bb_xleft bb_ytop bb_width bb_height ";
         for (QualityMeasure e = QualityMeasure::Begin; e != QualityMeasure::End; ++e) {
             logStream << e << " "; 
@@ -67,11 +65,8 @@ runQuality(
         image.description = mapStringToImgLabel[desc];
 
         Image face{image};
-        double quality{-1.0};
         ImageQualityAssessment assessments;
-        if (action == Action::ScalarQ) 
-            ret = implPtr->scalarQuality(face, quality);
-        else if (action == Action::VectorQ)
+        if (action == Action::VectorQ)
             ret = implPtr->vectorQuality(face, assessments);
         
         /* If function is not implemented, clean up and exit */
@@ -79,12 +74,7 @@ runQuality(
             break;
         }
 
-        if (action == Action::ScalarQ) {
-            logStream << id << " "
-                << imagePath << " "
-                << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " "
-                << quality << endl;
-        } else if (action == Action::VectorQ) {
+        if (action == Action::VectorQ) {
             logStream << id << " "
                 << imagePath << " "
                 << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " ";
@@ -129,7 +119,7 @@ main(
 {
     auto exitStatus = SUCCESS;
 
-    uint16_t currAPIMajorVersion{3},
+    uint16_t currAPIMajorVersion{4},
         currAPIMinorVersion{0},
         currStructsMajorVersion{3},
         currStructsMinorVersion{0};
@@ -187,7 +177,6 @@ main(
 
     Action action = mapStringToAction[actionstr];
     switch(action) {
-        case Action::ScalarQ:
         case Action::VectorQ:
             break;
         default:
@@ -219,7 +208,6 @@ main(
         switch(fork()) {
         case 0: /* Child */
             switch (action) {
-                case Action::ScalarQ:
                 case Action::VectorQ:
                     return runQuality(
                         implPtr,

@@ -198,28 +198,6 @@ public:
     initialize(const std::string &configDir) = 0;
 
     /**
-     * @brief This function takes an image and outputs a quality scalar.
-     * The algorithm will be supplied with a label describing the type of image
-     * via Image::Label, and it is up to the implementation to alter its behavior
-     * based on the image type (e.g., Iso (full-frontal) versus Wild (off-angle).
-     *
-     * @param[in] face
-     * Single face image
-     * @param[out] quality
-     * A scalar value assessment of image quality.  The legal values are
-     * [0,100] - The value should have a monotonic decreasing relationship with
-     * false non-match rate anticipated for this sample if it was compared with
-     * a pristine image of the same person.  So, a low value indicates high
-     * expected FNMR.
-     * A value of -1.0 indicates a failed attempt to calculate a quality
-     * score or the value is unassigned.
-     */
-    virtual FRVT::ReturnStatus
-    scalarQuality(
-        const FRVT::Image &face,
-        double &quality) = 0;
-
-    /**
      * @brief  This function takes an image and outputs
      * face location and quality information. The quality assessment   
      * should be performed on the largest detected face.
@@ -269,7 +247,7 @@ extern uint16_t API_MAJOR_VERSION;
 extern uint16_t API_MINOR_VERSION;
 #else /* NIST_EXTERN_API_VERSION */
 /** API major version number. */
-uint16_t API_MAJOR_VERSION{3};
+uint16_t API_MAJOR_VERSION{4};
 /** API minor version number. */
 uint16_t API_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_API_VERSION */

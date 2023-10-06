@@ -26,7 +26,7 @@ rm -rf $outputDir; mkdir -p $outputDir
 echo "------------------------------"
 echo " Running FRVT Quality Validation"
 echo "------------------------------"
-for action in scalarQ vectorQ
+for action in vectorQ
 do
 	# Set number of child processes to fork()
 	numForks=1
@@ -85,7 +85,7 @@ do
 	rm -rf $outputDir/*
 done
 
-for action in scalarQ vectorQ
+for action in vectorQ
 do
 	numForks=4
 	inputFile=input/quality.txt

@@ -27,11 +27,6 @@ public:
     initialize(const std::string &configDir) override;
 
     FRVT::ReturnStatus
-    scalarQuality(
-        const FRVT::Image &face,
-        double &quality) override;
-
-    FRVT::ReturnStatus
     vectorQuality(
         const FRVT::Image &image,
         FRVT_QUALITY::ImageQualityAssessment &assessments) override;

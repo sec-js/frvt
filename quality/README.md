@@ -1,6 +1,6 @@
 # FRVT Quality Assessment validation package
 The purpose of this validation package is to
-1) validate that your software adheres to the [FRVT Quality Assessent API](https://pages.nist.gov/frvt/api/FRVT_ongoing_quality_api.pdf),
+1) validate that your software adheres to the [FRVT Quality Assessent API](https://pages.nist.gov/frvt/api/FRVT_ongoing_quality_sidd_api.pdf),
 2) ensure that NIST's execution of your library submission produces the expected output, and
 3) prepare your submission package to send to NIST
 
