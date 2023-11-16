@@ -258,7 +258,7 @@ extern uint16_t API_MINOR_VERSION;
 /** API major version number. */
 uint16_t API_MAJOR_VERSION{4};
 /** API minor version number. */
-uint16_t API_MINOR_VERSION{0};
+uint16_t API_MINOR_VERSION{1};
 #endif /* NIST_EXTERN_API_VERSION */
 }
 

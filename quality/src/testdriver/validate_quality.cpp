@@ -120,7 +120,7 @@ main(
     auto exitStatus = SUCCESS;
 
     uint16_t currAPIMajorVersion{4},
-        currAPIMinorVersion{0},
+        currAPIMinorVersion{1},
         currStructsMajorVersion{3},
         currStructsMinorVersion{0};
 
