@@ -33,8 +33,11 @@ enum class QualityMeasure {
     Overexposure,
     BackgroundUniformity,
     MouthOpen,
+    MouthOpen2,
     EyesOpen,
+    EyesOpen2,
     FaceOcclusion,
+    FaceOcclusion2,
     Resolution,
     InterEyeDistance,
     MotionBlur,
@@ -84,10 +87,16 @@ operator<<(
         return (s << "BackgroundUniformity");
     case QualityMeasure::MouthOpen:
         return (s << "MouthOpen");
+    case QualityMeasure::MouthOpen2:
+        return (s << "MouthOpen2");
     case QualityMeasure::EyesOpen:
         return (s << "EyesOpen");
+    case QualityMeasure::EyesOpen2:
+        return (s << "EyesOpen2");
     case QualityMeasure::FaceOcclusion:
         return (s << "FaceOcclusion");
+    case QualityMeasure::FaceOcclusion2:
+        return (s << "FaceOcclusion2");
     case QualityMeasure::Resolution:
         return (s << "Resolution");
     case QualityMeasure::InterEyeDistance:
