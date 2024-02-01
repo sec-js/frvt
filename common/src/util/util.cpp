@@ -198,6 +198,8 @@ std::map<std::string, Action> mapStringToAction =
     { "detectScannedMorphWithProbeImgAndMeta", Action::DetectScannedMorphWithProbeImgAndMeta },
     { "detectUnknownMorphWithProbeImgAndMeta", Action::DetectUnknownMorphWithProbeImgAndMeta },
     { "compare", Action::Compare },
+    { "demorph", Action::Demorph },
+    { "demorphDifferentially", Action::DemorphDifferentially },
     /* QUALITY */
     { "scalarQ", Action::ScalarQ },
     { "scalarQWithReference", Action::ScalarQWithReference },
@@ -234,6 +236,8 @@ std::map<Action, std::string> mapActionToString =
     { Action::DetectScannedMorphWithProbeImgAndMeta, "detectScannedMorphWithProbeImgAndMeta" },
     { Action::DetectUnknownMorphWithProbeImgAndMeta, "detectUnknownMorphWithProbeImgAndMeta" },
     { Action::Compare, "compare" },
+    { Action::Demorph, "demorph" },
+    { Action::DemorphDifferentially, "demorphDifferentially" },
     /* QUALITY */
     { Action::ScalarQ, "scalarQ" },
     { Action::ScalarQWithReference, "scalarQWithReference" },

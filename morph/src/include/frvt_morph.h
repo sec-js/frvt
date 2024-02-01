@@ -246,6 +246,92 @@ public:
         const FRVT::Image &verifImage,
         double &similarity) = 0;
 
+
+    /**
+     * @brief This function takes an input image and outputs two images.  
+     * If the input image is a morph, the algorithm should deduce/restore the two 
+     * individual face images/identities that contributed to the morph.  If the 
+     * input is a bona fide image, the algorithm should produce two images that are 
+     * essentially the same as the input photo. All morphs will be generated with two 
+     * contributing subjects.
+     *
+     * Optionally, the algorithm can also return a binary decision on whether the 
+     * image is a morph and a "morphiness" score on [0, 1] indicating how confident 
+     * the algorithm thinks the image is a morph, with 0 meaning confidence that the 
+     * image is not a morph and 1 representing absolute confidence that it is a morph.  
+     * A score of -1.0 indicates that the algorithm did not implement morph detection 
+     * and both "isMorph" and "score" will be ignored.
+     *
+     * If this function is not implemented, the algorithm shall return
+     * ReturnCode::NotImplemented.  
+     *
+     * @param[in] suspectedMorph
+     * Input image
+     * @param[out] outputSubject1
+     * If the input image is a morph, the algorithm should return the first 
+     * individual face image/identity that contributed to the morph.  If the input is a 
+     * bona fide image, the algorithm should produce an image that is essentially the 
+     * same as the input photo.
+     * @param[out] outputSubject2
+     * If the input image is a morph, the algorithm should return the second
+     * individual face image/identity that contributed to the morph.  If the input is a 
+     * bona fide image, the algorithm should produce an image that is essentially the 
+     * same as the input photo.
+     * @param[out] isMorph
+     * (optional) True if image contains a morph; False otherwise
+     * @param[out] score
+     * (optional) A score on [0, 1] representing how confident the algorithm is that the
+     * input image contains a morph.  0 means certainty that image does not contain
+     * a morph and 1 represents certainty that image contains a morph
+     */
+    virtual FRVT::ReturnStatus
+    demorph(
+        const FRVT::Image &suspectedMorph,
+        FRVT::Image &outputSubject1,
+        FRVT::Image &outputSubject2,
+        bool &isMorph,
+        double &score) = 0;
+
+    /**
+     * @brief This function takes two input images - a known unaltered/not morphed image
+     * of the subject (probeFace) and an image of the same subject that's in question (suspectedMorph).  
+     * If the input image is a morph, the algorithm should deduce/restore the other/unknown 
+     * individual face image/identity that contributed to the morph.  If the input is a bona fide 
+     * image, the algorithm should produce an image that is essentially the same as the input photo.
+     * 
+     * Optionally, the algorithm can also return a binary decision on whether the image is a morph 
+     * and a "morphiness" score on [0, 1] indicating how confident the algorithm thinks the image 
+     * is a morph, with 0 meaning confidence that the image is not a morph and 1 representing absolute 
+     * confidence that it is a morph.  A score of -1.0 indicates that the algorithm did not implement 
+     * morph detection and both "isMorph" and "score" will be ignored.
+     *
+     * If this function is not implemented, the algorithm shall return
+     * ReturnCode::NotImplemented.
+     *
+     * @param[in] suspectedMorph
+     * Input image
+     * @param[in] probeFace
+     * An image of the subject known not to be a morph (i.e., live capture
+     * image)
+     * @param[out] outputSubject
+     * If the input image is a morph, the algorithm should deduce/restore the other/unknown 
+     * individual face image/identity that contributed to the morph.  If the input is a bona 
+     * fide image, the algorithm should produce an image that is essentially the same as the input photo.
+     * @param[out] isMorph
+     * (optional) True if image contains a morph; False otherwise
+     * @param[out] score
+     * (optional) A score on [0, 1] representing how confident the algorithm is that the
+     * input image contains a morph.  0 means certainty that image does not contain
+     * a morph and 1 represents certainty that image contains a morph
+     */
+    virtual FRVT::ReturnStatus
+    demorphDifferentially(
+        const FRVT::Image &suspectedMorph,
+        const FRVT::Image &probeFace,
+        FRVT::Image &outputSubject,
+        bool &isMorph,
+        double &score) = 0;
+
     /**
      * @brief
      * Factory method to return a managed pointer to the Interface object.
@@ -276,7 +362,7 @@ extern uint16_t API_MAJOR_VERSION;
 extern uint16_t API_MINOR_VERSION;
 #else /* NIST_EXTERN_API_VERSION */
 /** API major version number. */
-uint16_t API_MAJOR_VERSION{4};
+uint16_t API_MAJOR_VERSION{5};
 /** API minor version number. */
 uint16_t API_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_API_VERSION */

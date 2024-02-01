@@ -110,6 +110,8 @@ enum class Action {
     DetectScannedMorphWithProbeImgAndMeta,
     DetectUnknownMorphWithProbeImgAndMeta,
     Compare,
+    Demorph,
+    DemorphDifferentially,
 	/* QUALITY */
 	ScalarQ,
 	ScalarQWithReference,

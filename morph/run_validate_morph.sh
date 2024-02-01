@@ -39,7 +39,7 @@ if [ -z "$(ls -A $outputDir)" ]; then
 	exit
 fi
 
-for input in detectNonScannedMorph detectScannedMorph detectUnknownMorph detectNonScannedMorphWithProbeImg detectScannedMorphWithProbeImg detectUnknownMorphWithProbeImg compare 
+for input in detectNonScannedMorph detectScannedMorph detectUnknownMorph detectNonScannedMorphWithProbeImg detectScannedMorphWithProbeImg detectUnknownMorphWithProbeImg compare demorph demorphDifferentially
 do
 	numInputLines=$(cat input/$input.txt | wc -l)
 	if [ ! -s "$outputDir/$input.log" ]; then

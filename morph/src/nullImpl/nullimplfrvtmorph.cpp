@@ -90,6 +90,49 @@ NullImplFRVTMorph::compareImages(
     return ReturnStatus(ReturnCode::Success);
 }
 
+ReturnStatus
+NullImplFRVTMorph::demorph(
+    const FRVT::Image &suspectedMorph,
+    FRVT::Image &outputSubject1,
+    FRVT::Image &outputSubject2,
+    bool &isMorph,
+    double &score)
+{
+    uint8_t *data = new uint8_t[suspectedMorph.size()];
+    std::memcpy(data, suspectedMorph.data.get(), suspectedMorph.size());
+    outputSubject1.data.reset(data, std::default_delete<uint8_t[]>());
+    outputSubject1.width = suspectedMorph.width;
+    outputSubject1.height = suspectedMorph.height;
+    outputSubject1.depth = suspectedMorph.depth;
+    
+    uint8_t *data2 = new uint8_t[suspectedMorph.size()];
+    std::memcpy(data2, suspectedMorph.data.get(), suspectedMorph.size());
+    outputSubject2.data.reset(data2, std::default_delete<uint8_t[]>());
+    outputSubject2.width = suspectedMorph.width;
+    outputSubject2.height = suspectedMorph.height;
+    outputSubject2.depth = suspectedMorph.depth;
+
+    return ReturnStatus(ReturnCode::NotImplemented);     
+}
+
+ReturnStatus
+NullImplFRVTMorph::demorphDifferentially(
+    const FRVT::Image &suspectedMorph,
+    const FRVT::Image &probeFace,
+    FRVT::Image &outputSubject,
+    bool &isMorph,
+    double &score)
+{
+    uint8_t *data = new uint8_t[suspectedMorph.size()];
+    std::memcpy(data, suspectedMorph.data.get(), suspectedMorph.size());
+    outputSubject.data.reset(data, std::default_delete<uint8_t[]>());
+    outputSubject.width = suspectedMorph.width;
+    outputSubject.height = suspectedMorph.height;
+    outputSubject.depth = suspectedMorph.depth;
+
+    return ReturnStatus(ReturnCode::NotImplemented);
+}
+
 std::shared_ptr<Interface>
 Interface::getImplementation()
 {

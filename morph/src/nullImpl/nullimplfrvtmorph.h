@@ -58,6 +58,22 @@ public:
         const FRVT::Image &verifImage,
         double &similarity) override;
 
+    FRVT::ReturnStatus
+    demorph(
+        const FRVT::Image &suspectedMorph,
+        FRVT::Image &outputSubject1,
+        FRVT::Image &outputSubject2,
+        bool &isMorph,
+        double &score) override;
+
+    FRVT::ReturnStatus
+    demorphDifferentially(
+        const FRVT::Image &suspectedMorph,
+        const FRVT::Image &probeFace,
+        FRVT::Image &outputSubject,
+        bool &isMorph,
+        double &score) override;
+
     static std::shared_ptr<FRVT_MORPH::Interface>
     getImplementation();
 

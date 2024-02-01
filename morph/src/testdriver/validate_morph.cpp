@@ -35,12 +35,32 @@ std::map<Action, FRVT_MORPH::ImageLabel> mapActionToMorphLabel =
     { Action::DetectUnknownMorphWithProbeImgAndMeta, FRVT_MORPH::ImageLabel::Unknown }
 };
 
+void
+writeImagePPM(
+    const FRVT::Image &image,
+    const std::string &outputStem)
+{
+    if (image.width == 0 || image.height == 0) {
+        cerr << "Failed to write invalid image: " << outputStem << ".  " 
+            << "Invalid image dimensions." << endl;
+        raise(SIGTERM);        
+    }
+
+    FILE *fp = fopen((outputStem).c_str(), "wb");
+    fprintf(fp, "P6\n");
+    fprintf(fp, "%d %d\n", image.width, image.height);
+    fprintf(fp, "255\n");
+    fwrite(image.data.get(), 1, image.size(), fp);
+    fclose(fp);
+}
+
 int
 detectMorph(
         std::shared_ptr<Interface> &implPtr,
         const string &inputFile,
         const string &outputLog,
-        Action action)
+        Action action,
+        const string &outputDir)
 {
     /* Read input file */
     ifstream inputStream(inputFile);
@@ -70,7 +90,12 @@ detectMorph(
         action == Action::DetectScannedMorphWithProbeImgAndMeta ||
         action == Action::DetectUnknownMorphWithProbeImgAndMeta) {
         logStream << "image probeImage isMorph score returnCode" << endl;
+    } else if (action == Action::Demorph) {
+        logStream << "image outputSubject1 outputSubject2 isMorph score returnCode" << endl;
+    } else if (action == Action::DemorphDifferentially) {
+        logStream << "image probeImage outputSubject isMorph score returnCode" << endl;
     }
+    
 
     std::map<std::string, FRVT_MORPH::SubjectMetadata::Sex> mapStringToSexLabel =
     {
@@ -79,7 +104,7 @@ detectMorph(
         { "MALE", FRVT_MORPH::SubjectMetadata::Sex::Male },
     };
 
-    while(std::getline(inputStream, line)) {
+    while (std::getline(inputStream, line)) {
         Image image, probeImage;
         auto imgs = split(line, ' ');
         if (!readImage(imgs[0], image)) {
@@ -88,6 +113,7 @@ detectMorph(
         }
         bool isMorph = false;
         double score = -1.0;
+        FRVT::Image outputSubject1, outputSubject2;
 
         if (action == Action::DetectNonScannedMorph ||
                 action == Action::DetectScannedMorph ||
@@ -110,6 +136,14 @@ detectMorph(
             }
             FRVT_MORPH::SubjectMetadata meta(mapStringToSexLabel[imgs[2]], std::stoi(imgs[3]), std::stoi(imgs[4])); 
             ret = implPtr->detectMorphDifferentially(image, mapActionToMorphLabel[action], probeImage, meta, isMorph, score);
+        } else if (action == Action::Demorph) {
+            ret = implPtr->demorph(image, outputSubject1, outputSubject2, isMorph, score); 
+        } else if (action == Action::DemorphDifferentially) {
+            if (!readImage(imgs[1], probeImage)) {
+                cerr << "Failed to load image file(s): " << imgs[1] << "." << endl;
+                raise(SIGTERM);
+            }
+            ret = implPtr->demorphDifferentially(image, probeImage, outputSubject1, isMorph, score);
         }
 
         /* If function is not implemented, clean up and exit */
@@ -127,6 +161,21 @@ detectMorph(
                 action == Action::DetectUnknownMorphWithProbeImgAndMeta)
             logStream << imgs[1] << " ";
 
+        if (action == Action::Demorph) {
+            auto stem = split(split(imgs[0], '/').back(), '.').front();
+            std::string subj1 = stem + "_outputSubject1.ppm";
+            std::string subj2 = stem + "_outputSubject2.ppm";
+            writeImagePPM(outputSubject1, outputDir + "/" + subj1);
+            writeImagePPM(outputSubject2, outputDir + "/" + subj2);
+
+            logStream << subj1 << " " << subj2 << " ";
+        } else if (action == Action::DemorphDifferentially) {
+            auto stem = split(split(imgs[0], '/').back(), '.').front();
+            std::string subj1 = stem + "_outputSubject.ppm";
+            writeImagePPM(outputSubject1, outputDir + "/" + subj1);
+            logStream << imgs[1] << " " << subj1 << " ";
+        }
+        
         logStream << isMorph << " "
                 << score << " "
                 << static_cast<std::underlying_type<ReturnCode>::type>(ret.code)
@@ -229,7 +278,9 @@ void usage(const string &executable)
             "|detectNonScannedMorphWithProbeImgAndMeta"
             "|detectScannedMorphWithProbeImgAndMeta"
             "|detectUnknownMorphWithProbeImgAndMeta"
-            "|compare -c configDir "
+            "|compare"
+            "|demorph"
+            "|demorphDifferentially -c configDir "
             "-o outputDir -h outputStem -i inputFile -t numForks" << endl;
     exit(EXIT_FAILURE);
 }
@@ -241,7 +292,7 @@ main(
 {
     auto exitStatus = SUCCESS;
 
-    uint16_t currAPIMajorVersion{4},
+    uint16_t currAPIMajorVersion{5},
 		currAPIMinorVersion{0},
 		currStructsMajorVersion{3},
 		currStructsMinorVersion{0};
@@ -300,7 +351,6 @@ main(
         }
     }
 
-
     Action action = mapStringToAction[actionstr];
     switch (action) {
         case Action::DetectNonScannedMorph:
@@ -313,6 +363,8 @@ main(
         case Action::DetectScannedMorphWithProbeImgAndMeta:
         case Action::DetectUnknownMorphWithProbeImgAndMeta:
         case Action::Compare:
+        case Action::Demorph:
+        case Action::DemorphDifferentially:
             break;
         default:
             cerr << "Unknown command: " << actionstr << endl;
@@ -352,11 +404,14 @@ main(
                 case Action::DetectNonScannedMorphWithProbeImgAndMeta:
                 case Action::DetectScannedMorphWithProbeImgAndMeta:
                 case Action::DetectUnknownMorphWithProbeImgAndMeta:
+                case Action::Demorph:
+                case Action::DemorphDifferentially:
                     return detectMorph(
                             implPtr,
                             inputFile,
                             outputDir + "/" + outputFileStem + ".log." + to_string(i),
-                            action);
+                            action,
+                            outputDir);
                 case Action::Compare:
                     return compare(
                             implPtr,

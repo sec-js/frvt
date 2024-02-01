@@ -13,7 +13,7 @@ fi
 outputDir=validation
 rm -rf $outputDir; mkdir -p $outputDir
 
-# Usage: ../bin/validate_morph detectNonScannedMorph|detectScannedMorph|detectUnknownMorph|detectNonScannedMorphWithProbeImg|detectScannedMorphWithProbeImg|detectUnknownMorphWithProbeImg|detectNonScannedMorphWithProbeImgAndMeta|detectScannedMorphWithProbeImgAndMeta|detectUnknownMorphWithProbeImgAndMeta|compare -c configDir -o outputDir -i inputFile -t numForks
+# Usage: ../bin/validate_morph detectNonScannedMorph|detectScannedMorph|detectUnknownMorph|detectNonScannedMorphWithProbeImg|detectScannedMorphWithProbeImg|detectUnknownMorphWithProbeImg|detectNonScannedMorphWithProbeImgAndMeta|detectScannedMorphWithProbeImgAndMeta|detectUnknownMorphWithProbeImgAndMeta|compare|demorph|demorphDifferentially -c configDir -o outputDir -i inputFile -t numForks
 #   detectScannedMorph ...: task to process
 #   configDir: configuration directory
 #   configValue: configuration parameter string
@@ -27,7 +27,7 @@ echo "------------------------------"
 # Set number of child processes to fork()
 numForks=2
 
-for action in detectNonScannedMorph detectScannedMorph detectUnknownMorph detectNonScannedMorphWithProbeImg detectScannedMorphWithProbeImg detectUnknownMorphWithProbeImg detectNonScannedMorphWithProbeImgAndMeta detectScannedMorphWithProbeImgAndMeta detectUnknownMorphWithProbeImgAndMeta compare
+for action in detectNonScannedMorph detectScannedMorph detectUnknownMorph detectNonScannedMorphWithProbeImg detectScannedMorphWithProbeImg detectUnknownMorphWithProbeImg detectNonScannedMorphWithProbeImgAndMeta detectScannedMorphWithProbeImgAndMeta detectUnknownMorphWithProbeImgAndMeta compare demorph demorphDifferentially
 do
 	inputFile=input/${action}.txt
 	echo -n "Running $action "
