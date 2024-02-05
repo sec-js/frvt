@@ -376,9 +376,7 @@ public:
      * @param[in] candidateListLength
      * The number of candidates the search should return.
      * @param[out] candidateList
-     * Each candidate shall be populated by the implementation.  The candidates
-     * shall appear in descending order of similarity score - i.e. most similar
-     * entries appear first.
+     * Each candidate shall be populated by the implementation.
      */
     virtual FRVT::ReturnStatus
     identifyTemplate(
