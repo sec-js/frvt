@@ -1,12 +1,12 @@
-# FRVT twins demonstrations validation package
+# FRTE twins demonstrations validation package
 
 # Important 
-1) FRVT twins demonstration track uses the FRVT 1:1 API.
-2) You must download the FRVT 1:1 validation package before running the FRVT twins demonstration validation package.
-3) FRVT Twins demonstration track will not test the multiface version of createTemplate()
+1) FRTE twins demonstration track uses the FRTE 1:1 API.
+2) You must download the FRTE 1:1 validation package before running the FRTE twins demonstration validation package.
+3) FRTE Twins demonstration track will not test the multiface version of createTemplate()
 
 The purpose of this validation package is to
-1) validate that your software adheres to the [FRVT 1:1 API](https://pages.nist.gov/frvt/api/FRVT_ongoing_11_api.pdf),
+1) validate that your software adheres to the [FRTE 1:1 API](https://pages.nist.gov/frvt/api/FRVT_ongoing_11_api.pdf),
 2) ensure that NIST's execution of your library submission produces the expected output, and
 3) prepare your submission package to send to NIST
 
@@ -50,7 +50,7 @@ The validation script will
 5) Upon successful validation, an archive will be generated named
    libfrvt_11_twins_\<company\>_\<three-digit submission sequence\>.v\<validation_package_version\>.tar.gz
 
-   This archive must be properly encrypted and signed before transmission to NIST.  This must be done using the LATEST FRVT Ongoing public key linked from -
+   This archive must be properly encrypted and signed before transmission to NIST.  This must be done using the LATEST FRTE/FATE Ongoing public key linked from -
    https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwaredata-transmission-nist.
 
    For example:
@@ -63,7 +63,7 @@ libfrvt_11_twins_<company>_<three-digit submission sequence>.v<validation_packag
 6) Submit the archive to NIST following the instructions at
    [http://pages.nist.gov/frvt/html/frvt_submission_form.html](http://pages.nist.gov/frvt/html/frvt_submission_form.html).
 
-7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRVT mailing list to receive emails when new reports are published or announcements are made.
+7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRTE/FATE mailing list to receive emails when new reports are published or announcements are made.
 
 Send any questions or concerns regarding this validation package to frvt@nist.gov.
 

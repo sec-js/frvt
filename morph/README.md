@@ -1,6 +1,6 @@
-# FRVT MORPH validation package
+# FATE MORPH validation package
 The purpose of this validation package is to
-1) validate that your software adheres to the [FRVT MORPH API](https://pages.nist.gov/frvt/api/FRVT_ongoing_morph_api.pdf),
+1) validate that your software adheres to the [FATE MORPH API](https://pages.nist.gov/frvt/api/FRVT_ongoing_morph_api.pdf),
 2) ensure that NIST's execution of your library submission produces the expected output, and
 3) prepare your submission package to send to NIST
 
@@ -12,7 +12,7 @@ The ../common/images directory will contain some images that the validation soft
 NOTE: The validation images are used for the sole purpose of validation and stress-testing your software.  The images are not necessarily representative of actual test data that will be used to evaluate the implementations.  Please do not contact NIST about actual testing with such validation-type imagery.
 
 # Null Implementation
-There is a null implementation of the FRVT MORPH API in ./src/nullImpl.  While the null implementation doesn't actually provide any real functionality, more importantly, it demonstrates mechanically how one could go about implementing, compiling, and building a library against the FRVT MORPH API.
+There is a null implementation of the FATE MORPH API in ./src/nullImpl.  While the null implementation doesn't actually provide any real functionality, more importantly, it demonstrates mechanically how one could go about implementing, compiling, and building a library against the FATE MORPH API.
 
 To compile and build the null implementation, from the top level validation directory run
 ````console
@@ -42,7 +42,7 @@ The validation script will
 
 5) Upon successful validation, an archive will be generated named libfrvt_morph_\<company\>_\<three-digit submission sequence\>.v\<validation_package_version\>.tar.gz
 
-   This archive must be properly encrypted and signed before transmission to NIST.  This must be done using the LATEST FRVT Ongoing public key linked from - https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwaredata-transmission-nist.
+   This archive must be properly encrypted and signed before transmission to NIST.  This must be done using the LATEST FRTE/FATE Ongoing public key linked from - https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwaredata-transmission-nist.
 
    For example:
 ````
@@ -54,7 +54,7 @@ libfrvt_morph_<company>_<three-digit submission sequence>.v<validation_package_v
 6) Submit the archive to NIST following the instructions at
    [http://pages.nist.gov/frvt/html/frvt_submission_form.html](http://pages.nist.gov/frvt/html/frvt_submission_form.html).
 
-7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRVT mailing list to receive emails when new reports are published or announcements are made.
+7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRTE/FATE mailing list to receive emails when new reports are published or announcements are made.
 
 Send any questions or concerns regarding this validation package to frvt@nist.gov.
 

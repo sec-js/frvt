@@ -1,8 +1,8 @@
 
-# FRVT and IREX 1:N validation package
+# FRTE and IREX 1:N validation package
 
 The purpose of this validation package is to
-1) validate that your software adheres to the [FRVT & IREX 1:N API](https://pages.nist.gov/frvt/api/FRVT_IREX_ongoing_1N_api.pdf),
+1) validate that your software adheres to the [FRTE & IREX 1:N API](https://pages.nist.gov/frvt/api/FRVT_IREX_ongoing_1N_api.pdf),
 2) ensure that NIST's execution of your library submission produces the expected output, and
 3) prepare your submission package to send to NIST.
 
@@ -17,7 +17,7 @@ The ../common/images directory will contain all of the images necessary for vali
 NOTE: The validation images are used for the sole purpose of validation and stress-testing your software.  The images are not necessarily representative of actual test data that will be used to evaluate the implementations.  Please do not contact NIST about actual testing with such validation-type imagery.
 
 # Null Implementation
-There is a null implementation of the FRVT & IREX 1:N API in ./src/nullImpl.  While the null implementation doesn't actually provide any real functionality, more importantly, it demonstrates mechanically how one could go about implementing, compiling, and building a library against the API.
+There is a null implementation of the FRTE & IREX 1:N API in ./src/nullImpl.  While the null implementation doesn't actually provide any real functionality, more importantly, it demonstrates mechanically how one could go about implementing, compiling, and building a library against the API.
 
 To compile and build the null implementation from the top level validation directory, run
 ````console
@@ -51,7 +51,7 @@ The validation script will
 
 5) Upon successful validation, an archive will be generated and named libfrvt_1N_\<company\>_\<three-digit submission sequence\>.v\<validation_package_version\>.tar.gz
 
-   This archive must be properly encrypted and signed before transmission to NIST.  This must be done using the LATEST FRVT 1:N Ongoing public key linked from -
+   This archive must be properly encrypted and signed before transmission to NIST.  This must be done using the LATEST FRTE/FATE Ongoing public key linked from -
    https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwaredata-transmission-nist.
 
    For example:
@@ -64,11 +64,11 @@ libfrvt_1N_<company>_<three-digit submission sequence>.v<validation_package_vers
 6) Submit the archive to NIST following the instructions at
    [http://pages.nist.gov/frvt/html/frvt_submission_form.html](http://pages.nist.gov/frvt/html/frvt_submission_form.html).
 
-7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRVT mailing list to receive emails when new reports are published or announcements are made.
+7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRTE/FATE mailing list to receive emails when new reports are published or announcements are made.
 
 Send any questions or concerns regarding this validation package to frvt@nist.gov.
 
 # Acceptance
-NIST will validate the correct operation of the submissions on our platform by attempting to duplicate the submitted results using our own test driver linked with the participant's libraries.  In addition, NIST will perform a separate timing test to ensure the implementation meets the timing requirements for certain tasks as detailed in the [FRVT & IREX 1:N API document](https://pages.nist.gov/frvt/html/frvt1N.html).
+NIST will validate the correct operation of the submissions on our platform by attempting to duplicate the submitted results using our own test driver linked with the participant's libraries.  In addition, NIST will perform a separate timing test to ensure the implementation meets the timing requirements for certain tasks as detailed in the [FRTE & IREX 1:N API document](https://pages.nist.gov/frvt/html/frvt1N.html).
 
 Any discrepancies will be reported to the participant, and reasonable attempts will be made to resolve the issue.
