@@ -73,12 +73,13 @@ public:
      * param[out] personTemplate
      * A single output template.  The format of the template is entirely
      * unregulated.  
-     * param[out] personTracks 
-     * For each still/frame in each piece of media, the function shall return
+     * param[out] personTracks (optional)
+     * For each still/frame in each piece of media, the function can optionally return
      * bounding boxes around the detected face for the subject. 
      * This will be an empty vector when passed into the
      * function, and the implementation shall populate it with the appropriate
-     * number of entries.  Values in personTracks[i] shall correspond to input media[i].
+     * number of entries.  If the developer chooses to return bounding boxes, values in 
+     * personTracks[i] should correspond to input media[i].
      */
     virtual FIVE::ReturnStatus
     createEnrollmentTemplate(
@@ -89,7 +90,7 @@ public:
     /**
      * @brief This function supports search/probe/identification template generation of one or more people detected
      * in the provided input media.  It takes a single piece of input media (still photo or video frames) 
-     * and outputs one or more templates and tracks based on the number of people detected.
+     * and outputs one or more templates and optionally, tracks based on the number of people detected.
      *
      * @details
      * If the function returns a non-successful return status, the output template(s) will be not be used
@@ -101,13 +102,13 @@ public:
      * A vector of output template(s).  The format of the template(s) is entirely
      * unregulated.  This will be an empty vector when passed into the function, and
      * the implementation can resize and populate it with the appropriate data.
-     * param[out] personTracks
-     * For each person detected in the media, the function shall return
+     * param[out] personTracks (optional)
+     * For each person detected in the media, the function can optionally return
      * bounding boxes around the detected face.
      * This will be an empty vector when passed into the
-     * function, and the implementation shall populate it with the appropriate
-     * number of entries.  Values in personTracks[i] shall correspond to the 
-     * person in personTemplates[i].  
+     * function, and the implementation should populate it with the appropriate
+     * number of entries.  If the developer chooses to return bounding boxes, values in 
+     * personTracks[i] shall correspond to the person in personTemplates[i].  
      */
     virtual FIVE::ReturnStatus
     createSearchTemplate(
@@ -272,7 +273,7 @@ extern uint16_t API_MINOR_VERSION;
 /** API major version number. */
 uint16_t API_MAJOR_VERSION{0};
 /** API minor version number. */
-uint16_t API_MINOR_VERSION{1};
+uint16_t API_MINOR_VERSION{2};
 #endif /* NIST_EXTERN_API_VERSION */
 }
 
