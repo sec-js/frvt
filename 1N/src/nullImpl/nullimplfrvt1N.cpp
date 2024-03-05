@@ -171,7 +171,7 @@ NullImplFRVT1N::identifyTemplate(
 
     double score = 100.0; 
     for (unsigned int i=0; i<candidateListLength; i++) {
-        candidateList.push_back(Candidate(true, templateIds[i%(templateIds.size())], score++));
+        candidateList.push_back(Candidate(true, templateIds[i%(templateIds.size())], score--));
     }
 
     return ReturnStatus(ReturnCode::Success);

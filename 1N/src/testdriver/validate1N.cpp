@@ -11,6 +11,10 @@
 #include <fstream>
 #include <iostream>
 #include <cstring>
+#include <unordered_set>
+#include <sstream>
+#include <iomanip>
+
 #include <sys/wait.h>
 #include <unistd.h>
 #include <csignal>
@@ -199,12 +203,77 @@ finalize(shared_ptr<Interface> &implPtr,
 }
 
 void
+printCandidateList(
+    const std::string &key,
+    const std::vector<FRVT_1N::Candidate> &candList)
+{
+    std::string printList;
+    int i = 0;
+    for (auto &c : candList) {
+        std::ostringstream streamObj;
+        streamObj << std::fixed << std::setprecision(10);
+        streamObj << c.score;
+        std::string scoreStr = streamObj.str();
+        printList += key + " " + std::to_string(i++) + " " + c.templateId + " " + scoreStr + "\n";
+    }
+    std::cerr << printList << std::endl;
+}
+
+void
+checkCandidateList(
+    const std::string &key,
+    const std::vector<FRVT_1N::Candidate> &candList,
+    const int &candListLength,
+    const Modality &modality)
+{
+    if (candList.size() != (unsigned int)candListLength) {
+        std::cerr << "[ERROR] The number of returned candidates: " << candList.size()
+            << " is not the same as the number of requested candidates: "
+            << candListLength << std::endl;
+        raise(SIGTERM);
+    }
+
+    /* Check for duplicate candidate IDs */
+    double thisScore, lastScore = candList[0].score;
+    std::unordered_set<std::string> dupCheck;
+    for (auto &c : candList) {
+        dupCheck.insert(c.templateId);
+
+        /* While we're iterating, ensure scores in order */
+        if (c.isAssigned) {
+            thisScore = c.score;
+            if (modality == Modality::Face || modality == Modality::MM) { 
+                if (lastScore < thisScore) {
+                    std::cerr << "[ERROR] Scores are not sorted in descending order." << std::endl;
+                    printCandidateList(key, candList);
+                    raise(SIGTERM);
+                }
+            } else if (modality == Modality::Iris) {
+                if (lastScore > thisScore) {
+                    std::cerr << "[ERROR] Scores are not sorted in ascending order." << std::endl;
+                    printCandidateList(key, candList);
+                    raise(SIGTERM);
+                }
+            }
+            lastScore = thisScore;
+        }
+    }
+
+    if (dupCheck.size() != candList.size()) {
+        std::cerr << "[ERROR] Duplicate template IDs exist in the candidate list (this is not allowed!)." << std::endl;
+        printCandidateList(key, candList);
+        raise(SIGTERM);
+    }
+}
+
+void
 searchAndLog(
     shared_ptr<Interface> &implPtr,
     const string &id,
     const vector<uint8_t> &templ,
     ofstream &candListStream,
-    const FRVT::ReturnStatus &templGenRet)
+    const FRVT::ReturnStatus &templGenRet,
+    const Modality &modality)
 {
     vector<Candidate> candidateList;
     FRVT::ReturnStatus ret;
@@ -217,13 +286,16 @@ searchAndLog(
                 candidateList);
         if (ret.code != ReturnCode::Success) {
             /* Populate candidate list with null entries */
-            candidateList.resize(candListLength);
+            candidateList.resize(candListLength, Candidate(false, "NA", -1.0));
         }
     } else {
         ret = templGenRet;
         /* Populate candidate list with null entries */
-        candidateList.resize(candListLength);
+        candidateList.resize(candListLength, Candidate(false, "NA", -1.0));
     }
+
+    if (ret.code == ReturnCode::Success)
+        checkCandidateList(id, candidateList, candListLength, modality);
 
     /* Write to candidate list file */
     int i{0};
@@ -300,7 +372,7 @@ search(shared_ptr<Interface> &implPtr,
             }
 
             /* Do search and log results to candidatelist file */
-            searchAndLog(implPtr, id, templ, candListStream, ret);
+            searchAndLog(implPtr, id, templ, candListStream, ret, modality);
         } else if (action == Action::SearchMulti_1N) {
             if (modality != Modality::Face) {
                 cerr << "[ERROR] SearchMulti_1N can only be called for the face modality." << endl;
@@ -317,7 +389,7 @@ search(shared_ptr<Interface> &implPtr,
             /* For each template generated, do search and log results to candidatelist file */
             for (unsigned int i = 0; i < templs.size(); i++) {
                 string templID = id + "_" + to_string(i);
-                searchAndLog(implPtr, templID, templs[i], candListStream, ret);            
+                searchAndLog(implPtr, templID, templs[i], candListStream, ret, modality);            
             }
         }
     }
