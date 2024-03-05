@@ -8,8 +8,6 @@ The [1N](https://github.com/usnistgov/frvt/tree/master/1N) directory is for the 
 
 The [11](https://github.com/usnistgov/frvt/tree/master/11) directory is for the [FRTE 1:1 (one-to-one) evaluation](https://pages.nist.gov/frvt/api/FRVT_ongoing_11_api.pdf).
 
-The [pad](https://github.com/usnistgov/frvt/tree/master/pad) directory is for the [FATE presentation attack detection evaluation](https://pages.nist.gov/frvt/api/FRVT_pad_api.pdf).
-
 The [quality](https://github.com/usnistgov/frvt/tree/master/quality) directory is for the [FATE automated quality assessment evaluation](https://pages.nist.gov/frvt/api/FRVT_ongoing_quality_api.pdf).
 
 The [morph](https://github.com/usnistgov/frvt/tree/master/morph) directory is for the [FATE automated facial morph detection evaluation](https://pages.nist.gov/frvt/api/FRVT_ongoing_morph_api.pdf).
