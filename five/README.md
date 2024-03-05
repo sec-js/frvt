@@ -54,7 +54,7 @@ The validation script will
 ````
 $ gpg --default-key <ParticipantEmail> --output <filename>.gpg --encrypt \\
 --recipient frvt@nist.gov --sign \\
-libfrvt_1N_<company>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
+libfrte_five_<company>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
 ````
 
 6) Submit the archive to NIST following the instructions at
