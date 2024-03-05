@@ -116,13 +116,13 @@ typedef struct Media {
     enum class Label {
         /** Still photos of an individual */
         Image = 0,
-        /** Sequential video frames of an individual */
+        /** Sequential/chronological video frames of an individual */
         Video = 1
     };
 
     /** Type of media */
     Label type;
-    /** Vector of still image(s) or video frames */
+    /** Vector of still image(s) or video frames in chronological order */
     std::vector<FIVE::Image> data;
     /** For video data, the frame rate in frames per second */
     uint8_t fps;
@@ -361,9 +361,9 @@ extern uint16_t FIVE_STRUCTS_MAJOR_VERSION;
 extern uint16_t FIVE_STRUCTS_MINOR_VERSION;
 #else /* NIST_EXTERN_FIVE_STRUCTS_VERSION */
 /** major version number. */
-uint16_t FIVE_STRUCTS_MAJOR_VERSION{0};
+uint16_t FIVE_STRUCTS_MAJOR_VERSION{1};
 /** minor version number. */
-uint16_t FIVE_STRUCTS_MINOR_VERSION{1};
+uint16_t FIVE_STRUCTS_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_FIVE_STRUCTS_VERSION */
 }
 

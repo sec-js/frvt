@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstring>
 #include <cstdlib>
+#include <iomanip>
 
 #include "nullimplfrvt11.h"
 
@@ -36,7 +37,7 @@ NullImplFRVT11::createFaceTemplate(
         std::vector<EyePair> &eyeCoordinates)
 {
     /* Note: example code, potentially not portable across machines. */
-    std::vector<float> fv = {1.0, 2.0, 8.88, 765.88989};
+    std::vector<float> fv = {0.388819890, 2.0, 8.88, 765.88989};
     const uint8_t* bytes = reinterpret_cast<const uint8_t*>(fv.data());
     int dataSize = sizeof(float) * fv.size();
     templ.resize(dataSize);
@@ -91,13 +92,11 @@ NullImplFRVT11::matchTemplates(
         const std::vector<uint8_t> &enrollTemplate,
         double &score)
 {
-    /*
     float *featureVector = (float *)enrollTemplate.data();
 
     for (unsigned int i=0; i<this->featureVectorSize; i++) {
-	std::cout << featureVector[i] << std::endl;
+	std::cout << std::setprecision(10) << featureVector[i] << std::endl;
     }
-    */
 
     score = rand() % 1000 + 1;
     return ReturnStatus(ReturnCode::Success);
