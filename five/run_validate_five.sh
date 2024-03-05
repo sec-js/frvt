@@ -76,8 +76,8 @@ libstring=${libstring%.so}
 for directory in config lib validation doc
 do
         if [ ! -d "$directory" ]; then
-                echo "[ERROR] Could not create submission package.  The $directory directory is missing."
-                exit $failure
+            echo "[ERROR] Could not create submission package.  The $directory directory is missing."
+            exit $failure
         fi
 done
 
