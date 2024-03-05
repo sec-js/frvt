@@ -103,10 +103,6 @@ For example:
       --encrypt --recipient frvt@nist.gov --sign \\\\
       libfrvt_11_<organization>_<three-digit submission sequence>.v<validation_package_version>.tar.gz
 
-Send the encrypted file and your public key to NIST.  You can
-      a) Email the files to frvt@nist.gov if your package is less than 20MB OR
-      b) Provide a download link from a generic http webserver (NIST will NOT register or establish any kind of
-         membership on the provided website) OR
-      c) Mail a CD/DVD to NIST at the address provided in the participation agreement
+Submit the encrypted file and your public key to NIST following the instructions at http://pages.nist.gov/frvt/html/frvt_submission_form.html.
 ##################################################################################################################
 "
