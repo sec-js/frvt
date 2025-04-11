@@ -58,7 +58,7 @@ runEstimateAge(
     std::shared_ptr<Interface> &implPtr,
     const string &inputFile,
     const string &outputLog,
-    const bool hasTwoMedia)
+    const bool withReference)
 {
     /* Read input file */
     ifstream inputStream(inputFile);
@@ -83,28 +83,31 @@ runEstimateAge(
         double estimateAge{-1.0};
         auto tokens = split(line, ' ');
         id = tokens[0];
-     	if (hasTwoMedia){
+     	if (withReference){
 	    string mediaOnedesc = tokens[2];
 	    FRVT::Media mediaOne = createMedia(tokens[1], mediaOnedesc);
 	    double imageOneAge = stod(tokens[3]);
 	    string mediaTwodesc = tokens[5];
 	    FRVT::Media mediaTwo = createMedia(tokens[4], mediaTwodesc);;
-	    ret = implPtr->estimateAge(mediaOne, imageOneAge, mediaTwo, estimateAge);
+	    ret = implPtr->estimateAgeWithReference(mediaOne, imageOneAge, mediaTwo, estimateAge);
 	}
 	else{
 	    FRVT::Media media = createMedia(tokens[1], tokens[2]);
             ret = implPtr->estimateAge(media, estimateAge);
         }
 
-	if (ret.code == ReturnCode::NotImplemented) {
+	/* If function 3 - estimageAge(media, age, media) is not implemented, stop immediately 
+	 * because it is an optional function */
+	if (withReference && ret.code == ReturnCode::NotImplemented) {
+	    break;
+	/* If function 1 - estimageAge(media) is not implemented, throws a signal
+	 * because it is a required function */    
+	}else if (ret.code == ReturnCode::NotImplemented) {
             cerr << "[ERROR] The estimageAge(face, age) function returned ReturnCode::NotImplemented.  This function must be implemented!" << std::endl;
             raise(SIGTERM);
         }
-
-	std::stringstream ageEstimate_ss;
-        ageEstimate_ss << std::fixed << std::setprecision(2) << estimateAge;
         logStream << id << " "
-            << ageEstimate_ss.str() << " "
+            << std::fixed << std::setprecision(2) << estimateAge << " "
             << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " " 
             << std::endl;
     }
@@ -147,25 +150,27 @@ runVerifyAge(
     }
 
     /* header */
-    logStream << "id ageThreshold isAboveThreshold returnCode" << endl;
+    logStream << "id ageThreshold score returnCode" << endl;
 
     string id, line;
     ReturnStatus ret;
     while (std::getline(inputStream, line)) {
-        bool isAboveThreshold;
+        //bool isAboveThreshold;
+	double score{0.0};
         auto tokens = split(line, ' ');
         id = tokens[0];
         FRVT::Media media = createMedia(tokens[1], tokens[2]); 
-        ret = implPtr->verifyAge(media, ageThreshold, isAboveThreshold);
-        
+        ret = implPtr->verifyAge(media, ageThreshold, score);
+
+        /* If verifyAge() is not implemented, stop immediately
+         * because it is an optional function */ 
 	if (ret.code == ReturnCode::NotImplemented) {
-            cerr << "[ERROR] The estimageAge(face, age) function returned ReturnCode::NotImplemented.  This function must be implemented!" << std::endl;
-            raise(SIGTERM);
+	    break;
         }
 
         logStream << id << " "
             << ageThreshold << " "
-	    << (isAboveThreshold ? "TRUE" : "FALSE") << " "
+	    << score << " "
             << static_cast<std::underlying_type<ReturnCode>::type>(ret.code) << " " 
             << std::endl;
     }
@@ -198,7 +203,7 @@ main(
 {
     auto exitStatus = SUCCESS;
 
-    uint16_t currAPIMajorVersion{1},
+    uint16_t currAPIMajorVersion{2},
         currAPIMinorVersion{0},
         currStructsMajorVersion{3},
         currStructsMinorVersion{0};
@@ -236,7 +241,7 @@ main(
     outputFileStem{"stem"},
     inputFile;
     int numForks = 1;
-    bool hasTwoMedia = false;
+    bool withReference = false;
     double ageThreshold{-1.0};
 
     for (int i = 0; i < argc - requiredArgs; i++) {
@@ -253,16 +258,16 @@ main(
         else if (strcmp(argv[requiredArgs+i],"-a") == 0)
             ageThreshold = atoi(argv[requiredArgs+(++i)]);
         else if (strcmp(argv[requiredArgs+i],"-x") == 0)
-            hasTwoMedia = atoi(argv[requiredArgs+(++i)]);
+            withReference = atoi(argv[requiredArgs+(++i)]);
         else {
             cerr << "[ERROR] Unrecognized flag: " << argv[requiredArgs+i] << endl;;
             usage(argv[0]);
         }
     }
-
     Action action = mapStringToAction[actionstr];
     switch(action) {
         case Action::EstimateAge:
+	case Action::EstimateAgeWithReference:
         case Action::VerifyAge:
             break;
         default:
@@ -295,11 +300,12 @@ main(
         case 0: /* Child */
             switch (action) {
                 case Action::EstimateAge:
+                case Action::EstimateAgeWithReference:
 		    return runEstimateAge(
 			implPtr,
                         inputFile,
                         outputDir + "/" + outputFileStem + ".log." + to_string(i),
-			hasTwoMedia);
+			withReference);
 		case Action::VerifyAge:
                     return runVerifyAge(
                         implPtr,

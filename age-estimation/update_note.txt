@@ -1,0 +1,13 @@
+April, 2025 - version 2
+---------------------
+- [Function] estimateAge(media) 
+	- Require function
+	- no change
+
+- [Function] verifyAge(media, ageThreshold) 
+	- Optional function (read API for details)
+
+- [Function] estimateAgeWithReference(known media, known age, media) 
+	- Optional function (read API for details)
+	- renamed from estimateAge --> estimateAgeWithReference
+

@@ -32,18 +32,20 @@ public:
             double &age) override;
 
     FRVT::ReturnStatus
-    estimateAge(
-            const FRVT::Media &faceOnei,
-	    const double &ageOne,
+    estimateAgeWithReference(
+            const FRVT::Media &faceOne,
+	    const double ageOne,
             const FRVT::Media &faceTwo,
             double &age) override;
 
     FRVT::ReturnStatus
     verifyAge(
         const FRVT::Media &face,
-        const double &ageThreshold,
-        bool &isAboveThreshold) override;
+        const double ageThreshold,
+        double &confidence) override;
 
+        //bool &isAboveThreshold) override;
+	
     static std::shared_ptr<FRVT_AE::Interface>
     getImplementation();
 

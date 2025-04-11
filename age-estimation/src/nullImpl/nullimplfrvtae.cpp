@@ -34,31 +34,45 @@ NullImplFRVTAE::estimateAge(
         const FRVT::Media &face,
         double &age)
 {
-    age = rand() % 100 + 1;
+    age = ((double) rand() / RAND_MAX)* (100 - 1) + 1;  
     return ReturnStatus(ReturnCode::Success);
 }
 
 ReturnStatus
-NullImplFRVTAE::estimateAge(
+NullImplFRVTAE::estimateAgeWithReference(
 	const FRVT::Media &faceOne,
-        const double &ageOne,
+        const double ageOne,
         const FRVT::Media &faceTwo,
         double &age)
 {
-    age = rand() % 100 + 1;
-    return ReturnStatus(ReturnCode::Success);
+
+    // This function is optional
+    
+    // IF YOU DO NOT implement this function - 
+    //return ReturnStatus(ReturnCode::NotImplemented);
+
+    // IF YOU WILL implement this fuction, code goes here.	
+     age = ((double) rand() / RAND_MAX)* (100 - 1) + 1;
+     return ReturnStatus(ReturnCode::Success);
 }
 
 ReturnStatus
 NullImplFRVTAE::verifyAge(
         const FRVT::Media &face,
-        const double &age,
-	bool &isAboveThreshold)
+        const double age,
+	double &score)
 {
-    isAboveThreshold = false;
-    if ((1 + ( rand() % 50 )) % 2 == 1){
-	isAboveThreshold = true;
-    }
+   	
+    // This function is optional
+    
+    // DO NOT implement this function if you are just comparing an age estimate with the given threshold
+    // ONLY implement this function if more sophisticated logic is being used.
+    
+    // IF YOU DO NOT implement this function -
+    //return ReturnStatus(ReturnCode::NotImplemented);
+    
+    // IF YOU WILL implement this fuction, code goes here.	
+    score = ((double) rand() / RAND_MAX)* (100 - 1) + 1;
     return ReturnStatus(ReturnCode::Success);
 }
 

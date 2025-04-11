@@ -112,18 +112,20 @@ enum class Action {
     Compare,
     Demorph,
     DemorphDifferentially,
-	/* QUALITY */
-	ScalarQ,
-	ScalarQWithReference,
-	ScalarImageQ,
-	ScalarSubjectQ,
-	VectorQ,
+    /* QUALITY */
+    ScalarQ,
+    ScalarQWithReference,
+    ScalarImageQ,
+    ScalarSubjectQ,
+    VectorQ,
     /* PAD */
     DetectImpersonationPA,
     DetectEvasionPA,
-    /*AGE ESTIMATION */	
-    EstimateAge,					
-    VerifyAge
+    /*AGE ESTIMATION */
+    EstimateAge,
+    VerifyAge,
+    EstimateAgeWithReference
+
 };
 
 /**

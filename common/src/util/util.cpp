@@ -212,6 +212,7 @@ std::map<std::string, Action> mapStringToAction =
     /* AGE ESTIMATION */
     { "estimateAge", Action::EstimateAge },
     { "verifyAge", Action::VerifyAge },
+    { "estimateAgeWithReference", Action::EstimateAgeWithReference},
 };
 
 std::map<Action, std::string> mapActionToString =
@@ -250,6 +251,7 @@ std::map<Action, std::string> mapActionToString =
     /* AGE ESTIMATION */
     { Action::EstimateAge, "estimateAge" },
     { Action::VerifyAge, "verifyAge" },
+    { Action::EstimateAgeWithReference, "estimateAgeWithReference" },
 };
 
 std::map<std::string, FRVT::Image::ImageDescription> mapStringToImgLabel =

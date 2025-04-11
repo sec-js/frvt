@@ -39,15 +39,15 @@ sanityCheck(){
         numLogs=$((numLogs+1))
         numLogLines=$(sed '1d' $outputlog | wc -l)
         if [ "$numInputLines" != "$numLogLines" ]; then
-            echo "[ERROR] The $outputlog not include results for all of the input images.  Please re-run the validation test."
+            echo "[ERROR] The $outputDir/$action.log file does not include results for all of the input images.  Please re-run the validation test."
             exit $failure
         fi
 
         # Check return codes
         numFail=$(sed '1d' $outputlog | awk '{ if($NF!=0) print }' | wc -l)
         if [ "$numFail" != "0" ]; then
-            echo -e "\n${bold}[WARNING] The following entries in $outputlog generated non-successful return codes:${normal}"
-            sed '1d' $outputlog | awk '{ if($NF!=0) print }'
+            echo -e "\n${bold}[WARNING] The following entries in $action.log generated non-successful return codes:${normal}"
+            sed '1d' $outputDir/$action.log | awk '{ if($NF!=0) print }'
         fi
         echo "${GREEN}[DONE]${END}"
     else
@@ -56,18 +56,20 @@ sanityCheck(){
 }
 
 numLogs=0
-for actionType in estimateAge_1 estimateAge_2 verifyAge
+for actionType in estimateAge estimateAgeWithReference verifyAge
 do
     if [[ $actionType == "verifyAge" ]]; then
+        #action=$actionType
         outputlog=validation/$actionType.log
-	numInputLines=$(cat input/singleMedia.txt | wc -l)
+	numInputLines=$(cat input/aevInput.txt | wc -l)
     else
-        if [[ $actionType == "estimateAge_1" ]]; then
+        #action=estimateAge
+        if [[ $actionType == "estimateAge" ]]; then
             outputlog=validation/$actionType.log
-	    numInputLines=$(cat input/singleMedia.txt |wc -l )
-        elif [[ $actionType == "estimateAge_2" ]];then
+	    numInputLines=$(cat input/aevInput.txt |wc -l )
+        elif [[ $actionType == "estimateAgeWithReference" ]];then
             outputlog=validation/$actionType.log
-	    numInputLines=$(cat input/twoMedia.txt | wc -l)
+	    numInputLines=$(cat input/aevInputWithReference.txt | wc -l)
         fi
     fi
 
@@ -80,11 +82,11 @@ done
 
 
 if [ "$numLogs" == "0" ]; then
-    echo "${bold}[ERROR] There are no output logs in the validation folder.  Please make sure you have implemented all age estimation functions from the API.${END}"
+	echo "${bold}[ERROR] There are no output logs in the validation folder.  Please make sure you have implemented the required estimationAge(media) function from the API.${END}"
     exit $failure
-elif [ "$numLogs" -lt "3" ]; then
-    echo "${bold}[ERROR] At lease 3 validation output logs should be in the validation folder.  Please make sure you have implemented the require age estimation functions from the API.${END}"
-    exit $failure
+#elif [ "$numLogs" -lt "3" ]; then
+#    echo "${bold}[ERROR] At lease 3 validation output logs should be in the validation folder.  Please make sure you have implemented the require age estimation functions from the API.${END}"
+#    exit $failure
 fi
 
 # Create submission archive

@@ -21,7 +21,7 @@ namespace FRVT_AE {
 
 /**
  * @brief
- * The interface to FRVT AE (Age Estimation) implementation
+ * The interface to FATE AEV (Age Estimation & Verification) implementation
  *
  * @details
  * The submission software under test will implement this interface by
@@ -78,30 +78,31 @@ public:
      * from separate media.  The legal absolute values are [0,100]
      */
     virtual FRVT::ReturnStatus
-    estimateAge(
+    estimateAgeWithReference(
 	const FRVT::Media &faceOne,
-	const double &ageOne,
+	const double ageOne,
 	const FRVT::Media &faceTwo,
         double &age) = 0;
 
      /**
-     * @brief This function returns a binary decision on whether the face in the image is above an age threshold.  
+     * @brief This function returns a decision score on whether the face in the image is above an age threshold.  
      * This function prototype allows an implementation to invoke specialized processing for certain age groups.  
-     * We anticipate calling this function with ageThreshold values in {12, 18, 21, and 70}.  
+     * We anticipate calling this function only with ageThreshold values in {13, 16, 18, 21, 25}.  
      * We may use other values also. 
      *
      * @param[in] face
      * Input media of an image or a sequential video frames of one person.
      * @param[in] ageThreshold
      * Input age of interest. 
-     * @param[out] isAboveThreshold
-     * True if the estimated age of the input media is above the age threshold; False otherwise. 
+     * @param[out] score 
+     * A very high score indicates strong confidence that the input media exceeds the threshold,
+     * otherwise, assign a very low score. 
      */
     virtual FRVT::ReturnStatus
     verifyAge(
         const FRVT::Media &face,
-        const double &ageThreshold,
-        bool &isAboveThreshold) = 0;
+        const double ageThreshold,
+	double &score) = 0;
 
     /**
      * @brief
@@ -133,10 +134,11 @@ extern uint16_t API_MAJOR_VERSION;
 extern uint16_t API_MINOR_VERSION;
 #else /* NIST_EXTERN_API_VERSION */
 /** API major version number. */
-uint16_t API_MAJOR_VERSION{1};
+uint16_t API_MAJOR_VERSION{2};
 /** API minor version number. */
 uint16_t API_MINOR_VERSION{0};
 #endif /* NIST_EXTERN_API_VERSION */
 }
 
-#endif /* FRVT_QUALITY_H_ */
+#endif /* FRVT_AE_H_ */
+

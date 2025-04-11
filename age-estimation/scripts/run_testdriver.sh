@@ -29,35 +29,28 @@ echo "${RED} Running FRVT Age-Estimation Validation ${END}"
 echo "${RED}--------------------------------------- ${END}"
 
 echo "${BLUE}checking for hard-coded config directory${END}"
-for actionType in estimateAge_1 estimateAge_2 verifyAge
+for actionType in estimateAge estimateAgeWithReference verifyAge
 do
     optCmd=""	
+    inputFile=input/short_aevInput.txt
     if [[ $actionType == "verifyAge" ]]; then
-	action=$actionType
-	inputFile=input/short_singleMedia.txt
+	#inputFile=input/short_aevInput.txt
 	optCmd="-a 18"
-	echo -n "$action() - "
-    else
-        action=estimateAge
+    elif [[ $actionType == "estimateAge" ]]; then
 	optCmd="-x 0"
-    	if [[ $actionType == "estimateAge_1" ]]; then
-    	    inputFile=input/short_singleMedia.txt
-	    echo -n "$action() - "
-        elif [[ $actionType == "estimateAge_2" ]];then
-    	    inputFile=input/short_twoMedia.txt
-	    optCmd="-x 1"
-	    echo -n "$action(two inputs) - "
-	fi
+    elif [[ $actionType == "estimateAgeWithReference" ]];then
+    	inputFile=input/short_aevInputWithReference.txt
+	optCmd="-x 1"
     fi
 
-    #echo -n "$action ($actionType) - checking for hard-coded config directory "
+    echo -n "$actionType() - "
     
     numForks=1
-    outputStem=$action
+    outputStem=$actionType
 
     tempConfigDir=otherConfig
     chmod 775 $configDir; mv $configDir $tempConfigDir; chmod 550 $tempConfigDir
-    bin/validate_ae $action -c $tempConfigDir -o $outputDir -h $outputStem -i $inputFile -t $numForks $optCmd 
+    bin/validate_ae $actionType -c $tempConfigDir -o $outputDir -h $outputStem -i $inputFile -t $numForks $optCmd 
     ret=$?
     if [[ $ret == 0 ]]; then
 	echo "${GREEN}[SUCCESS]${END}" 
@@ -78,33 +71,34 @@ done
 for process in single multiple
 do	
     echo "${BLUE}Processing validation in $process process${END}"
-    for actionType in estimateAge_1 estimateAge_2 verifyAge
+    for actionType in estimateAge estimateAgeWithReference verifyAge
     do
         optCmd=""
+        inputFile=input/aevInput.txt
         if [[ $actionType == "verifyAge" ]]; then
     	    ageThreshold=18
-            action=$actionType
-            inputFile=input/singleMedia.txt
+            #action=$actionType
             optCmd="-a $ageThreshold"
-            echo -n "$action() - "
-        else
-            action=estimateAge
+            #echo -n "$action() - "
+        elif [[ $actionType == "estimateAge" ]]; then
+            #action=estimateAge
             optCmd="-x 0"
-            if [[ $actionType == "estimateAge_1" ]]; then
-                inputFile=input/singleMedia.txt
-                echo -n "$action() - "
-            elif [[ $actionType == "estimateAge_2" ]];then
-                inputFile=input/twoMedia.txt
-                optCmd="-x 1"
-                echo -n "$action(two inputs) - "
-            fi
+            #if [[ $actionType == "estimateAge" ]]; then
+            #    inputFile=input/aevInput.txt
+                #echo -n "$action() - "
+        elif [[ $actionType == "estimateAgeWithReference" ]];then
+            inputFile=input/aevInputWithReference.txt
+            optCmd="-x 1"
+                #echo -n "$action(two inputs) - "
+            #fi
         fi
+        echo -n "$actionType() - "
     	if [[ $process == "single" ]]; then
             # Start checking for threading
             ../common/scripts/count_threads.sh validate_ae $outputDir/thread.log & pid=$!
     
             outputStem=validation
-            bin/validate_ae $action -c $configDir -o $outputDir -h $outputStem -i $inputFile -t $numForks $optCmd
+            bin/validate_ae $actionType -c $configDir -o $outputDir -h $outputStem -i $inputFile -t $numForks $optCmd
             ret=$?
     
             # End checking for threading
@@ -121,8 +115,10 @@ do
     	    	if [ "$maxThreads" -gt "3" ]; then
     	            echo "${bold}[WARNING] We've detected that your software may be threading or using other multiprocessing techniques.  The number of processes detected was $maxThreads and it should be 2.  Per the API document, implementations must run single-threaded.  In the test environment, there is no advantage to threading, because NIST will distribute workload across multiple blades and multiple processes.  We highly recommend that you fix this issue prior to submission.${normal}"
     	        fi
+	    elif [[ $ret == 2 ]]; then
+                echo "[NOT IMPLEMENTED]"
             else
-    	    	echo "${bold}[ERROR] $action in age estimation validation (single process) failed${normal}"
+    	    	echo "${bold}[ERROR] $actionType in age estimation validation (single process) failed${normal}"
     	    	exit $failure
             fi
     
@@ -130,14 +126,16 @@ do
     	else #$process == "multiple"
             outputStem=$actionType
             numForks=4
-            bin/validate_ae $action -c $configDir -o $outputDir -h $outputStem -i $inputFile -t $numForks $optCmd
+            bin/validate_ae $actionType -c $configDir -o $outputDir -h $outputStem -i $inputFile -t $numForks $optCmd
             ret=$?
             if [[ $ret == 0 ]]; then
     	    	echo "${GREEN}[SUCCESS]${END}"
     	    	# Merge output files together
     	    	merge $outputDir/$outputStem log
+	    elif [[ $ret == 2 ]]; then
+                echo "[NOT IMPLEMENTED]"
             else
-    	    	echo "${bold}[ERROR] $action age-estimation validation (multiple process) failed.  Please ensure your software is compatible with fork(2).${normal}"
+    	    	echo "${bold}[ERROR] $actionType age-estimation validation (multiple process) failed.  Please ensure your software is compatible with fork(2).${normal}"
     	    	exit $failure
             fi
     	fi
