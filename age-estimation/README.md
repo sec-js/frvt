@@ -1,6 +1,6 @@
 # FATE Age Estimation (AE) validation package
 The purpose of this validation package is to
-1) validate that your software adheres to the [FATE AE API](https://pages.nist.gov/frvt/api/FATE_AgeEstimation_API_v1.pdf),
+1) validate that your software adheres to the [FATE AE API](https://pages.nist.gov/frvt/api/FATE_AgeEstimation_API_v2.pdf),
 2) ensure that NIST's execution of your library submission produces the expected output, and
 3) prepare your submission package to send to NIST
 
@@ -44,7 +44,7 @@ The validation script will
 5) Upon successful validation, an archive will be generated named
    libfrvt_ae_\<company\>_\<three-digit submission sequence\>.v\<validation_package_version\>.tar.gz
 
-   This archive must be properly encrypted and signed before transmission to NIST.  This must be done according to these instructions - https://www.nist.gov/system/files/nist_encryption.pdf using the LATEST FRTE/FATE Ongoing public key linked from -
+   This archive must be properly encrypted and signed before transmission to NIST.  This must be done according to these instructions - https://www.nist.gov/system/files/nist_encryption.pdf using the LATEST FRVT Ongoing public key linked from -
    https://www.nist.gov/itl/iad/image-group/products-and-services/encrypting-softwaredata-transmission-nist.
 
    For example:
@@ -56,7 +56,7 @@ libfrvt_ae_<company>_<three-digit submission sequence>.v<validation_package_vers
 
 6) Submit the archive to NIST following the instructions at http://pages.nist.gov/frvt/html/frvt_submission_form.html.
 
-7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRTE/FATE mailing list to receive emails when new reports are published or announcements are made.
+7) Participants must [subscribe](mailto:frvt-news+subscribe@list.nist.gov) to the FRVT mailing list to receive emails when new reports are published or announcements are made.
 
 Send any questions or concerns regarding this validation package to frvt@nist.gov.
 
