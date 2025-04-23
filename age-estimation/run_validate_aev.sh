@@ -39,15 +39,15 @@ sanityCheck(){
         numLogs=$((numLogs+1))
         numLogLines=$(sed '1d' $outputlog | wc -l)
         if [ "$numInputLines" != "$numLogLines" ]; then
-            echo "[ERROR] The $outputDir/$action.log file does not include results for all of the input images.  Please re-run the validation test."
+            echo "[ERROR] The $outputlog file does not include results for all of the input images.  Please re-run the validation test."
             exit $failure
         fi
 
         # Check return codes
         numFail=$(sed '1d' $outputlog | awk '{ if($NF!=0) print }' | wc -l)
         if [ "$numFail" != "0" ]; then
-            echo -e "\n${bold}[WARNING] The following entries in $action.log generated non-successful return codes:${normal}"
-            sed '1d' $outputDir/$action.log | awk '{ if($NF!=0) print }'
+            echo -e "\n${bold}[WARNING] The following entries in $outputlog generated non-successful return codes:${normal}"
+            sed '1d' $outputlog | awk '{ if($NF!=0) print }'
         fi
         echo "${GREEN}[DONE]${END}"
     else
